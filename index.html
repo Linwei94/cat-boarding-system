@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>喵喵寄养管理系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     登录页
+     ============================================================ -->
+<div id="login-page" class="login-container">
+  <div class="login-card">
+    <span class="login-logo">🐱</span>
+    <h1>喵喵寄养管理系统</h1>
+    <p class="subtitle">猫咪寄养 & 上门喂养一站式管理</p>
+    <form id="login-form">
+      <div class="form-group" style="text-align:left">
+        <label>邮箱账号</label>
+        <input type="email" id="login-email" required placeholder="请输入邮箱">
+      </div>
+      <div class="form-group" style="text-align:left">
+        <label>密码</label>
+        <input type="password" id="login-password" required placeholder="请输入密码（至少6位）">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-bottom:10px">登录</button>
+      <button type="button" id="register-btn" class="btn btn-outline btn-full">首次使用？注册账号</button>
+      <div id="login-error" class="error-msg"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     主应用
+     ============================================================ -->
+<div id="app" class="hidden">
+
+  <!-- 顶部导航 -->
+  <header class="app-header">
+    <span class="app-logo">🐱 喵喵寄养</span>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="boarding">🏠 猫咪寄养</button>
+      <button class="tab-btn" data-tab="homevisit">🚗 上门喂养</button>
+      <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
+    </nav>
+    <div class="header-right">
+      <button id="logout-btn" class="btn btn-outline btn-sm">退出</button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       Tab 1：猫咪寄养
+       ============================================================ -->
+  <div id="boarding-tab" class="tab-content active">
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">🐈</div>
+        <div class="stat-info">
+          <div class="stat-number" id="today-cats-count">-</div>
+          <div class="stat-label">今日寄养猫咪</div>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <div class="stat-number" id="today-boarding-income">-</div>
+          <div class="stat-label">今日寄养收入</div>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <div class="stat-number" id="month-boarding-income">-</div>
+          <div class="stat-label">本月寄养收入</div>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <div class="stat-number" id="year-boarding-income">-</div>
+          <div class="stat-label">今年寄养收入</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日寄养区块 -->
+    <div class="section">
+      <div class="section-header">
+        <h2>今日寄养的猫咪 🐱</h2>
+        <span class="section-date" id="today-date"></span>
+      </div>
+      <div id="today-cats-list" class="cats-grid">
+        <div class="empty-state">
+          <div class="empty-icon">😴</div>
+          <p>今日没有寄养的猫咪</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 寄养记录操作栏 -->
+    <div class="actions-bar">
+      <h2>寄养记录</h2>
+      <div class="actions-right">
+        <button class="btn btn-primary" onclick="openAddBoarding()">+ 新增寄养</button>
+        <button class="btn btn-secondary" onclick="openAddOwner()">+ 新增主人</button>
+        <button class="btn btn-secondary" onclick="openAddCat()">+ 新增猫咪</button>
+      </div>
+    </div>
+
+    <!-- 寄养记录表格 -->
+    <div class="table-container">
+      <div class="table-filters">
+        <select id="boarding-status-filter" onchange="filterBoardings(this.value)">
+          <option value="all">全部状态</option>
+          <option value="active" selected>进行中</option>
+          <option value="completed">已完成</option>
+          <option value="cancelled">已取消</option>
+        </select>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>猫咪</th>
+            <th>主人</th>
+            <th>房型</th>
+            <th>入住</th>
+            <th>退房</th>
+            <th>天数</th>
+            <th>日费</th>
+            <th>总价</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="boardings-tbody">
+          <tr><td colspan="10" class="text-center" style="padding:32px;color:#aaa">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Tab 2：上门喂养
+       ============================================================ -->
+  <div id="homevisit-tab" class="tab-content">
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">🏃</div>
+        <div class="stat-info">
+          <div class="stat-number" id="today-visits-count">-</div>
+          <div class="stat-label">今日上门次数</div>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <div class="stat-number" id="today-visit-income">-</div>
+          <div class="stat-label">今日上门收入</div>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <div class="stat-number" id="month-visit-income">-</div>
+          <div class="stat-label">本月上门收入</div>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <div class="stat-number" id="year-visit-income">-</div>
+          <div class="stat-label">今年上门收入</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日上门区块 -->
+    <div class="section">
+      <div class="section-header">
+        <h2>今日上门喂养 🚗</h2>
+        <span class="section-date" id="today-date-visit"></span>
+      </div>
+      <div id="today-visits-list" class="visits-grid">
+        <div class="empty-state">
+          <div class="empty-icon">🏠</div>
+          <p>今日没有上门喂养安排</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 上门喂养操作栏 -->
+    <div class="actions-bar">
+      <h2>上门喂养记录</h2>
+      <div class="actions-right">
+        <button class="btn btn-primary" onclick="openAddHomeVisit()">+ 新增上门喂养</button>
+      </div>
+    </div>
+
+    <!-- 上门喂养表格 -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>主人</th>
+            <th>猫咪</th>
+            <th>地址</th>
+            <th>时间</th>
+            <th>日期（前几笔）</th>
+            <th>每次价格</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="homevisits-tbody">
+          <tr><td colspan="8" class="text-center" style="padding:32px;color:#aaa">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Tab 3：设置
+       ============================================================ -->
+  <div id="settings-tab" class="tab-content">
+    <div class="settings-grid">
+
+      <!-- 主人管理 -->
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>主人管理 👤</h2>
+          <button class="btn btn-primary btn-sm" onclick="openAddOwner()">+ 新增主人</button>
+        </div>
+        <div class="table-container" style="margin:0;box-shadow:none;border:1px solid var(--border)">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>折扣</th>
+                <th>猫咪数</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="owners-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 猫咪管理 -->
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>猫咪管理 🐱</h2>
+          <button class="btn btn-primary btn-sm" onclick="openAddCat()">+ 新增猫咪</button>
+        </div>
+        <div class="table-container" style="margin:0;box-shadow:none;border:1px solid var(--border)">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>名字</th>
+                <th>品种 / 年龄</th>
+                <th>性别</th>
+                <th>主人</th>
+                <th>特殊说明</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="cats-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 房型设置 -->
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>房型设置 🏠</h2>
+          <button class="btn btn-primary btn-sm" onclick="openAddRoomType()">+ 新增房型</button>
+        </div>
+        <div class="table-container" style="margin:0;box-shadow:none;border:1px solid var(--border)">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>房型名称</th>
+                <th>描述</th>
+                <th>每日价格</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="room-types-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ============================================================
+     弹窗：新增/编辑寄养
+     ============================================================ -->
+<div id="add-boarding-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('add-boarding-modal')"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="boarding-modal-title">新增寄养</h3>
+      <button class="modal-close" onclick="hideModal('add-boarding-modal')">✕</button>
+    </div>
+    <form id="boarding-form">
+      <input type="hidden" id="boarding-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>选择主人 *</label>
+          <select id="boarding-owner" required onchange="onBoardingOwnerChange()">
+            <option value="">请选择主人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>选择猫咪 *</label>
+          <select id="boarding-cat" required>
+            <option value="">请先选择主人</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>房型 *</label>
+          <select id="boarding-room-type" required onchange="calculateBoardingPrice()">
+            <option value="">请选择房型</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>折扣后日费（元）</label>
+          <input type="number" id="boarding-daily-rate" step="0.01" readonly placeholder="自动计算">
+          <small>根据主人折扣自动计算</small>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>入住日期 *</label>
+          <input type="date" id="boarding-checkin" required onchange="calculateBoardingPrice()">
+        </div>
+        <div class="form-group">
+          <label>退房日期 *</label>
+          <input type="date" id="boarding-checkout" required onchange="calculateBoardingPrice()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>天数</label>
+          <input type="number" id="boarding-days" readonly placeholder="自动计算">
+        </div>
+        <div class="form-group">
+          <label>总价（元）</label>
+          <input type="number" id="boarding-total-price" step="0.01" placeholder="自动计算，可修改">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>状态</label>
+          <select id="boarding-status">
+            <option value="active">进行中</option>
+            <option value="completed">已完成</option>
+            <option value="cancelled">已取消</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" id="boarding-notes" placeholder="特殊需求或备注">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('add-boarding-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     弹窗：新增/编辑主人
+     ============================================================ -->
+<div id="add-owner-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('add-owner-modal')"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="owner-modal-title">新增主人</h3>
+      <button class="modal-close" onclick="hideModal('add-owner-modal')">✕</button>
+    </div>
+    <form id="owner-form">
+      <input type="hidden" id="owner-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名 *</label>
+          <input type="text" id="owner-name" required placeholder="主人姓名">
+        </div>
+        <div class="form-group">
+          <label>联系电话</label>
+          <input type="tel" id="owner-phone" placeholder="手机号码">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>折扣率（%）</label>
+          <input type="number" id="owner-discount" min="0" max="100" step="0.1" value="0" placeholder="0">
+          <small>0 = 不打折｜10 = 九折｜20 = 八折｜50 = 五折</small>
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="owner-email" placeholder="电子邮件（选填）">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>地址</label>
+        <input type="text" id="owner-address" placeholder="家庭地址（选填）">
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="owner-notes" rows="3" placeholder="特殊需求、喜好等备注信息"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('add-owner-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     弹窗：新增/编辑猫咪
+     ============================================================ -->
+<div id="add-cat-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('add-cat-modal')"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="cat-modal-title">新增猫咪</h3>
+      <button class="modal-close" onclick="hideModal('add-cat-modal')">✕</button>
+    </div>
+    <form id="cat-form">
+      <input type="hidden" id="cat-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>猫咪名字 *</label>
+          <input type="text" id="cat-name" required placeholder="猫咪的名字">
+        </div>
+        <div class="form-group">
+          <label>所属主人 *</label>
+          <select id="cat-owner" required>
+            <option value="">请选择主人</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>品种</label>
+          <input type="text" id="cat-breed" placeholder="例：英短、布偶猫、混种">
+        </div>
+        <div class="form-group">
+          <label>年龄</label>
+          <input type="text" id="cat-age" placeholder="例：2岁、6个月">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>性别</label>
+          <select id="cat-gender">
+            <option value="unknown">未知</option>
+            <option value="male">公</option>
+            <option value="female">母</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>颜色 / 外观特征</label>
+          <input type="text" id="cat-color" placeholder="例：橘色虎斑、白底黑斑">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>特殊说明</label>
+        <textarea id="cat-notes" rows="3" placeholder="饮食习惯、药物需求、怕生、过敏等特殊照顾事项"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('add-cat-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     弹窗：新增/编辑上门喂养
+     ============================================================ -->
+<div id="add-homevisit-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('add-homevisit-modal')"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 id="homevisit-modal-title">新增上门喂养</h3>
+      <button class="modal-close" onclick="hideModal('add-homevisit-modal')">✕</button>
+    </div>
+    <form id="homevisit-form">
+      <input type="hidden" id="homevisit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>选择主人 *</label>
+          <select id="homevisit-owner" required onchange="onVisitOwnerChange()">
+            <option value="">请选择主人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>选择猫咪</label>
+          <select id="homevisit-cat">
+            <option value="">全部猫咪 / 不指定</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>上门地址 *</label>
+          <input type="text" id="homevisit-address" required placeholder="上门喂养的地址">
+        </div>
+        <div class="form-group">
+          <label>上门时间</label>
+          <input type="text" id="homevisit-time" placeholder="例：早上9点、下午3-5点">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>每次价格（元）</label>
+          <input type="number" id="homevisit-price" step="0.01" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>状态</label>
+          <select id="homevisit-status">
+            <option value="active">进行中</option>
+            <option value="completed">已完成</option>
+            <option value="cancelled">已取消</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 多选日期日历 -->
+      <div class="form-group">
+        <label>选择上门日期（可多选）*</label>
+        <div id="visit-calendar" class="visit-calendar">
+          <!-- 由 JS 渲染 -->
+        </div>
+        <div class="selected-dates-display" id="selected-dates-display">
+          已选日期：<span id="selected-dates-text">请在上方点击日期选择</span>
+        </div>
+        <input type="hidden" id="homevisit-dates" value="[]">
+      </div>
+
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="homevisit-notes" rows="2" placeholder="特殊要求、注意事项等"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('add-homevisit-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     弹窗：新增/编辑房型
+     ============================================================ -->
+<div id="add-room-type-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('add-room-type-modal')"></div>
+  <div class="modal-content" style="max-width:440px">
+    <div class="modal-header">
+      <h3 id="room-type-modal-title">新增房型</h3>
+      <button class="modal-close" onclick="hideModal('add-room-type-modal')">✕</button>
+    </div>
+    <form id="room-type-form">
+      <input type="hidden" id="room-type-id">
+      <div class="form-group">
+        <label>房型名称 *</label>
+        <input type="text" id="room-type-name" required placeholder="例：标准房、豪华房">
+      </div>
+      <div class="form-group">
+        <label>描述</label>
+        <textarea id="room-type-description" rows="3" placeholder="房型说明、包含服务等"></textarea>
+      </div>
+      <div class="form-group">
+        <label>每日价格（元）*</label>
+        <input type="number" id="room-type-price" required step="0.01" min="0" placeholder="0.00">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('add-room-type-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast 通知 -->
+<div id="toast" class="toast"></div>
+
+<!-- Loading 遮罩 -->
+<div id="loading-overlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+  <p>加载中...</p>
+</div>
+
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- 主应用逻辑 -->
+<script src="app.js"></script>
+</body>
+</html>
