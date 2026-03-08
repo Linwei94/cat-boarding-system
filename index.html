@@ -264,9 +264,9 @@
               <tr>
                 <th>姓名</th>
                 <th>电话</th>
+                <th>微信</th>
                 <th>折扣</th>
-                <th>猫咪数</th>
-                <th>备注</th>
+                <th>猫咪</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -323,6 +323,47 @@
   </div>
 
 </div><!-- end #app -->
+
+<!-- ============================================================
+     详情面板：主人
+     ============================================================ -->
+<div id="owner-detail-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('owner-detail-modal')"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 id="owner-detail-name">主人详情</h3>
+      <button class="modal-close" onclick="hideModal('owner-detail-modal')">✕</button>
+    </div>
+    <div style="padding:24px">
+      <!-- 基本信息 -->
+      <div class="detail-info-grid" id="owner-detail-info"></div>
+      <!-- 旗下猫咪 -->
+      <h4 style="margin:20px 0 12px;font-size:15px">旗下猫咪</h4>
+      <div id="owner-detail-cats" class="cats-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))"></div>
+      <!-- 寄养记录摘要 -->
+      <h4 style="margin:20px 0 12px;font-size:15px">寄养记录</h4>
+      <div id="owner-detail-boardings"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     详情面板：猫咪
+     ============================================================ -->
+<div id="cat-detail-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('cat-detail-modal')"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 id="cat-detail-name">猫咪详情</h3>
+      <button class="modal-close" onclick="hideModal('cat-detail-modal')">✕</button>
+    </div>
+    <div style="padding:24px">
+      <div class="detail-info-grid" id="cat-detail-info"></div>
+      <h4 style="margin:20px 0 12px;font-size:15px">寄养历史</h4>
+      <div id="cat-detail-boardings"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ============================================================
      弹窗：新增/编辑寄养
@@ -429,18 +470,24 @@
       </div>
       <div class="form-row">
         <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="owner-email" placeholder="电子邮件（选填）">
+        </div>
+        <div class="form-group">
+          <label>微信号</label>
+          <input type="text" id="owner-wechat" placeholder="微信号（选填）">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
           <label>折扣率（%）</label>
           <input type="number" id="owner-discount" min="0" max="100" step="0.1" value="0" placeholder="0">
           <small>0 = 不打折｜10 = 九折｜20 = 八折｜50 = 五折</small>
         </div>
         <div class="form-group">
-          <label>邮箱</label>
-          <input type="email" id="owner-email" placeholder="电子邮件（选填）">
+          <label>地址</label>
+          <input type="text" id="owner-address" placeholder="家庭地址（选填）">
         </div>
-      </div>
-      <div class="form-group">
-        <label>地址</label>
-        <input type="text" id="owner-address" placeholder="家庭地址（选填）">
       </div>
       <div class="form-group">
         <label>备注</label>

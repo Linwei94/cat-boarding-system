@@ -165,6 +165,13 @@ function formatCurrency(amount) {
   return 'A$' + parseFloat(amount || 0).toFixed(2);
 }
 
+// 性别符号
+function genderBadge(gender) {
+  if (gender === 'male')   return '<span class="gender-badge male">♂ 公</span>';
+  if (gender === 'female') return '<span class="gender-badge female">♀ 母</span>';
+  return '<span class="gender-badge unknown">— 未知</span>';
+}
+
 // 两日期（YYYY-MM-DD）相差天数
 function daysBetween(startStr, endStr) {
   const s = new Date(startStr + 'T00:00:00');
@@ -277,7 +284,11 @@ function renderUpcomingWeek() {
     );
 
     const chipsHtml = cats.length > 0
-      ? cats.map(b => `<span class="week-cat-chip">🐱 ${b.cat?.name || '未知'}</span>`).join('')
+      ? cats.map(b => {
+          const cat = state.cats.find(c => c.id === b.cat_id);
+          const sym = cat?.gender === 'male' ? '♂' : cat?.gender === 'female' ? '♀' : '';
+          return `<span class="week-cat-chip" onclick="openCatDetail('${b.cat_id}')" style="cursor:pointer">${sym} ${b.cat?.name || '未知'}</span>`;
+        }).join('')
       : '<span class="week-no-cats">—</span>';
 
     return `
@@ -297,16 +308,18 @@ function renderTodaysCats() {
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">😴</div><p>今日没有寄养的猫咪</p></div>';
     return;
   }
-  container.innerHTML = todaysCats.map(b => `
-    <div class="cat-card">
-      <div class="cat-card-name">🐱 ${b.cat?.name || '未知猫咪'}</div>
-      <div class="cat-card-info">主人：${b.owner?.name || '未知'}</div>
+  container.innerHTML = todaysCats.map(b => {
+    const cat = state.cats.find(c => c.id === b.cat_id);
+    return `
+    <div class="cat-card" onclick="openCatDetail('${b.cat_id}')" style="cursor:pointer">
+      <div class="cat-card-name">🐱 ${b.cat?.name || '未知猫咪'} ${cat ? genderBadge(cat.gender) : ''}</div>
+      <div class="cat-card-info" style="cursor:pointer;color:var(--primary)" onclick="event.stopPropagation();openOwnerDetail('${b.owner_id}')">主人：${b.owner?.name || '未知'}</div>
       <div class="cat-card-info">入住：${formatDateCN(b.check_in_date)}</div>
       <div class="cat-card-info">退房：${formatDateCN(b.check_out_date)}</div>
       <div class="cat-card-info">日费：${formatCurrency(b.daily_rate)}</div>
       <span class="cat-card-room">${b.room_type?.name || '未知房型'}</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // 寄养记录表格
@@ -335,8 +348,8 @@ function renderBoardingsTable() {
       : '';
     return `
       <tr>
-        <td><strong>${b.cat?.name || '未知'}</strong></td>
-        <td>${b.owner?.name || '未知'}</td>
+        <td><span class="link-text" onclick="openCatDetail('${b.cat_id}')">${b.cat?.name || '未知'}</span></td>
+        <td><span class="link-text" onclick="openOwnerDetail('${b.owner_id}')">${b.owner?.name || '未知'}</span></td>
         <td>${b.room_type?.name || '未知'}</td>
         <td>${formatDateCN(b.check_in_date)}</td>
         <td>${formatDateCN(b.check_out_date)}</td>
@@ -431,14 +444,14 @@ function renderOwnersTable() {
   }
   tbody.innerHTML = state.owners.map(o => {
     const catCount = state.cats.filter(c => c.owner_id === o.id).length;
-    const discountLabel = o.discount_rate > 0 ? `${o.discount_rate}% 折扣` : '无折扣';
+    const discountLabel = o.discount_rate > 0 ? `${o.discount_rate}%` : '-';
     return `
       <tr>
-        <td><strong>${o.name}</strong></td>
+        <td><span class="link-text" onclick="openOwnerDetail('${o.id}')">${o.name}</span></td>
         <td>${o.phone || '-'}</td>
+        <td>${o.wechat ? `<span style="color:#07C160">💬 ${o.wechat}</span>` : '-'}</td>
         <td>${discountLabel}</td>
-        <td>${catCount} 只</td>
-        <td style="font-size:12px;color:#888;max-width:150px">${o.notes || '-'}</td>
+        <td><span class="link-text" onclick="openOwnerDetail('${o.id}')">${catCount} 只</span></td>
         <td>
           <div class="btn-gap">
             <button class="btn btn-xs btn-secondary" onclick="openEditOwner('${o.id}')">编辑</button>
@@ -456,15 +469,14 @@ function renderCatsTable() {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:24px;color:#aaa">尚无猫咪资料</td></tr>`;
     return;
   }
-  const genderLabel = { male: '公 ♂', female: '母 ♀', unknown: '-' };
   tbody.innerHTML = state.cats.map(c => {
     const owner = state.owners.find(o => o.id === c.owner_id);
     return `
       <tr>
-        <td><strong>${c.name}</strong>${c.color ? `<br><small class="text-muted">${c.color}</small>` : ''}</td>
+        <td><span class="link-text" onclick="openCatDetail('${c.id}')">${c.name}</span>${c.color ? `<br><small class="text-muted">${c.color}</small>` : ''}</td>
         <td>${[c.breed, c.age].filter(Boolean).join(' / ') || '-'}</td>
-        <td>${genderLabel[c.gender] || '-'}</td>
-        <td>${owner?.name || '-'}</td>
+        <td>${genderBadge(c.gender)}</td>
+        <td><span class="link-text" onclick="openOwnerDetail('${c.owner_id}')">${owner?.name || '-'}</span></td>
         <td style="font-size:12px;color:#888;max-width:160px">${c.special_notes || '-'}</td>
         <td>
           <div class="btn-gap">
@@ -670,6 +682,7 @@ function openEditOwner(id) {
   document.getElementById('owner-name').value = o.name;
   document.getElementById('owner-phone').value = o.phone || '';
   document.getElementById('owner-email').value = o.email || '';
+  document.getElementById('owner-wechat').value = o.wechat || '';
   document.getElementById('owner-address').value = o.address || '';
   document.getElementById('owner-discount').value = o.discount_rate || 0;
   document.getElementById('owner-notes').value = o.notes || '';
@@ -683,6 +696,7 @@ document.getElementById('owner-form').addEventListener('submit', async (e) => {
     name: document.getElementById('owner-name').value.trim(),
     phone: document.getElementById('owner-phone').value.trim(),
     email: document.getElementById('owner-email').value.trim(),
+    wechat: document.getElementById('owner-wechat').value.trim(),
     address: document.getElementById('owner-address').value.trim(),
     discount_rate: parseFloat(document.getElementById('owner-discount').value) || 0,
     notes: document.getElementById('owner-notes').value.trim()
@@ -1035,6 +1049,109 @@ function showToast(message, type = 'success') {
   toast.className = `toast show ${type}`;
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ================================================================
+// 详情面板
+// ================================================================
+function openOwnerDetail(ownerId) {
+  if (!ownerId) return;
+  const o = state.owners.find(x => x.id === ownerId);
+  if (!o) return;
+
+  document.getElementById('owner-detail-name').textContent = o.name + ' 的资料';
+
+  // 基本信息卡
+  const infoItems = [
+    ['📞 电话', o.phone || '-'],
+    ['💬 微信', o.wechat ? `<span style="color:#07C160">${o.wechat}</span>` : '-'],
+    ['📧 邮箱', o.email || '-'],
+    ['🏷️ 折扣', o.discount_rate > 0 ? `${o.discount_rate}% 折扣` : '无折扣'],
+    ['📍 地址', o.address || '-'],
+    ['📝 备注', o.notes || '-'],
+  ];
+  document.getElementById('owner-detail-info').innerHTML = infoItems.map(([label, val]) =>
+    `<div class="detail-info-item"><span class="detail-label">${label}</span><span class="detail-val">${val}</span></div>`
+  ).join('');
+
+  // 旗下猫咪
+  const ownerCats = state.cats.filter(c => c.owner_id === ownerId);
+  const catsEl = document.getElementById('owner-detail-cats');
+  if (ownerCats.length === 0) {
+    catsEl.innerHTML = '<p style="color:#aaa;font-size:13px">尚无猫咪资料</p>';
+  } else {
+    catsEl.innerHTML = ownerCats.map(c => `
+      <div class="cat-card" onclick="openCatDetail('${c.id}')" style="cursor:pointer">
+        <div class="cat-card-name">${c.name} ${genderBadge(c.gender)}</div>
+        <div class="cat-card-info">${[c.breed, c.age].filter(Boolean).join(' · ') || '品种未知'}</div>
+        ${c.color ? `<div class="cat-card-info">${c.color}</div>` : ''}
+        ${c.special_notes ? `<div class="cat-card-info" style="font-size:11px;color:#e07">${c.special_notes}</div>` : ''}
+      </div>`).join('');
+  }
+
+  // 寄养记录
+  const ownerBoardings = state.boardings.filter(b => b.owner_id === ownerId);
+  const boardEl = document.getElementById('owner-detail-boardings');
+  const statusBadge = { active: '<span class="badge badge-active">进行中</span>', completed: '<span class="badge badge-completed">已完成</span>', cancelled: '<span class="badge badge-cancelled">已取消</span>' };
+  if (ownerBoardings.length === 0) {
+    boardEl.innerHTML = '<p style="color:#aaa;font-size:13px">暂无寄养记录</p>';
+  } else {
+    boardEl.innerHTML = `<table class="data-table" style="font-size:13px">
+      <thead><tr><th>猫咪</th><th>入住</th><th>退房</th><th>房型</th><th>总价</th><th>状态</th></tr></thead>
+      <tbody>${ownerBoardings.map(b => `<tr>
+        <td><span class="link-text" onclick="hideModal('owner-detail-modal');openCatDetail('${b.cat_id}')">${b.cat?.name || '-'}</span></td>
+        <td>${b.check_in_date}</td><td>${b.check_out_date}</td>
+        <td>${b.room_type?.name || '-'}</td>
+        <td>${formatCurrency(b.total_price)}</td>
+        <td>${statusBadge[b.status] || b.status}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  showModal('owner-detail-modal');
+}
+
+function openCatDetail(catId) {
+  if (!catId) return;
+  const c = state.cats.find(x => x.id === catId);
+  if (!c) return;
+  const owner = state.owners.find(o => o.id === c.owner_id);
+
+  document.getElementById('cat-detail-name').innerHTML = c.name + ' ' + genderBadge(c.gender);
+
+  const infoItems = [
+    ['🐾 品种', c.breed || '-'],
+    ['🎂 年龄', c.age || '-'],
+    ['🎨 颜色', c.color || '-'],
+    ['👤 主人', owner ? `<span class="link-text" onclick="hideModal('cat-detail-modal');openOwnerDetail('${owner.id}')">${owner.name}</span>` : '-'],
+    ['📞 主人电话', owner?.phone || '-'],
+    ['📝 特殊说明', c.special_notes || '无'],
+  ];
+  document.getElementById('cat-detail-info').innerHTML = infoItems.map(([label, val]) =>
+    `<div class="detail-info-item"><span class="detail-label">${label}</span><span class="detail-val">${val}</span></div>`
+  ).join('');
+
+  // 寄养历史
+  const catBoardings = state.boardings.filter(b => b.cat_id === catId);
+  const boardEl = document.getElementById('cat-detail-boardings');
+  const statusBadge = { active: '<span class="badge badge-active">进行中</span>', completed: '<span class="badge badge-completed">已完成</span>', cancelled: '<span class="badge badge-cancelled">已取消</span>' };
+  if (catBoardings.length === 0) {
+    boardEl.innerHTML = '<p style="color:#aaa;font-size:13px">暂无寄养记录</p>';
+  } else {
+    boardEl.innerHTML = `<table class="data-table" style="font-size:13px">
+      <thead><tr><th>入住</th><th>退房</th><th>天数</th><th>房型</th><th>日费</th><th>总价</th><th>状态</th></tr></thead>
+      <tbody>${catBoardings.map(b => `<tr>
+        <td>${b.check_in_date}</td><td>${b.check_out_date}</td>
+        <td>${daysBetween(b.check_in_date, b.check_out_date)} 天</td>
+        <td>${b.room_type?.name || '-'}</td>
+        <td>${formatCurrency(b.daily_rate)}</td>
+        <td><strong>${formatCurrency(b.total_price)}</strong></td>
+        <td>${statusBadge[b.status] || b.status}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  showModal('cat-detail-modal');
 }
 
 // ================================================================

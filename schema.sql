@@ -18,11 +18,14 @@ CREATE TABLE IF NOT EXISTS owners (
   name TEXT NOT NULL,
   phone TEXT,
   email TEXT,
+  wechat TEXT,
   address TEXT,
   discount_rate DECIMAL(5,2) DEFAULT 0 CHECK (discount_rate >= 0 AND discount_rate <= 100),
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+-- 若已建好表格，执行这行补充 wechat 栏位：
+-- ALTER TABLE owners ADD COLUMN IF NOT EXISTS wechat TEXT;
 
 -- 猫咪表
 CREATE TABLE IF NOT EXISTS cats (

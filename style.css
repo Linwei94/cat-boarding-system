@@ -721,6 +721,65 @@ body {
 }
 
 /* ================================================================
+   性别标签
+   ================================================================ */
+.gender-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.gender-badge.male    { background: #EBF5FB; color: #2980B9; }
+.gender-badge.female  { background: #FDECF8; color: #C0399F; }
+.gender-badge.unknown { background: #F0F0F0; color: #999; }
+
+/* 可点击文字 */
+.link-text {
+  cursor: pointer;
+  color: var(--primary-dark);
+  font-weight: 600;
+  text-decoration: underline dotted;
+}
+.link-text:hover { color: var(--primary); }
+
+/* ================================================================
+   详情面板
+   ================================================================ */
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+  background: #FAFAF8;
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.detail-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.detail-val {
+  font-size: 14px;
+  color: var(--text);
+}
+
+@media (max-width: 480px) {
+  .detail-info-grid { grid-template-columns: 1fr; }
+}
+
+/* ================================================================
    Toast 通知
    ================================================================ */
 .toast {
