@@ -541,12 +541,19 @@ body {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  animation: modalIn 0.25s ease;
+  animation: modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-overlay {
+  animation: overlayIn 0.2s ease;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .modal-content.modal-large { max-width: 680px; }
