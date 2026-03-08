@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { getToday, formatDateCN, formatCurrency, genderBadge, daysBetween } from './utils.js';
+import { getToday, formatDateCN, formatCurrency, genderBadge, roomBadge, daysBetween } from './utils.js';
 import { getTodaysBoardings, updateBoardingStats, updateHomeVisitStats } from './stats.js';
 
 // ── 下拉菜单 ────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ export function renderTodaysCats() {
         <div class="cat-card-info">入住：${formatDateCN(b.check_in_date)}</div>
         <div class="cat-card-info">退房：${formatDateCN(b.check_out_date)}</div>
         <div class="cat-card-info">日费：${formatCurrency(b.daily_rate)}</div>
-        <span class="cat-card-room">${b.room_type?.name || '未知房型'}</span>
+        ${roomBadge(b.room_type?.name)}
       </div>`;
   }).join('');
 }
@@ -96,7 +96,7 @@ export function renderBoardingsTable() {
       <tr>
         <td><span class="link-text" onclick="window.openCatDetail('${b.cat_id}')">${b.cat?.name || '未知'}</span></td>
         <td><span class="link-text" onclick="window.openOwnerDetail('${b.owner_id}')">${b.owner?.name || '未知'}</span></td>
-        <td>${b.room_type?.name || '未知'}</td>
+        <td>${roomBadge(b.room_type?.name)}</td>
         <td>${formatDateCN(b.check_in_date)}</td>
         <td>${formatDateCN(b.check_out_date)}</td>
         <td>${days} 天</td>
@@ -231,7 +231,7 @@ export function renderRoomTypesTable() {
   }
   tbody.innerHTML = state.roomTypes.map(r => `
     <tr>
-      <td><strong>${r.name}</strong></td>
+      <td>${roomBadge(r.name)}</td>
       <td style="font-size:13px;color:#666">${r.description || '-'}</td>
       <td><strong>${formatCurrency(r.price_per_day)}</strong> / 天</td>
       <td>

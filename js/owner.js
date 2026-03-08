@@ -1,7 +1,7 @@
 import { db } from './config.js';
 import { state } from './state.js';
 import { showModal, hideModal, showToast } from './ui.js';
-import { formatCurrency, genderBadge, daysBetween } from './utils.js';
+import { formatCurrency, genderBadge, roomBadge, daysBetween } from './utils.js';
 import { loadOwners, loadCats, loadOwnerRoomPrices } from './api.js';
 import { renderAll } from './render.js';
 
@@ -70,7 +70,7 @@ export function openOwnerDetail(ownerId) {
         <tbody>${ownerBoardings.map(b => `<tr>
           <td><span class="link-text" onclick="hideModal('owner-detail-modal');window.openCatDetail('${b.cat_id}')">${b.cat?.name || '-'}</span></td>
           <td>${b.check_in_date}</td><td>${b.check_out_date}</td>
-          <td>${b.room_type?.name || '-'}</td>
+          <td>${roomBadge(b.room_type?.name)}</td>
           <td>${formatCurrency(b.total_price)}</td>
           <td>${sb[b.status] || b.status}</td>
         </tr>`).join('')}</tbody>

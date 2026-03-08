@@ -1,7 +1,7 @@
 import { db } from './config.js';
 import { state } from './state.js';
 import { showModal, hideModal, showToast } from './ui.js';
-import { formatCurrency, genderBadge, daysBetween } from './utils.js';
+import { formatCurrency, genderBadge, roomBadge, daysBetween } from './utils.js';
 import { loadCats } from './api.js';
 import { renderAll } from './render.js';
 
@@ -36,7 +36,7 @@ export function openCatDetail(catId) {
         <tbody>${catBoardings.map(b => `<tr>
           <td>${b.check_in_date}</td><td>${b.check_out_date}</td>
           <td>${daysBetween(b.check_in_date, b.check_out_date)} 天</td>
-          <td>${b.room_type?.name || '-'}</td>
+          <td>${roomBadge(b.room_type?.name)}</td>
           <td>${formatCurrency(b.daily_rate)}</td>
           <td><strong>${formatCurrency(b.total_price)}</strong></td>
           <td>${sb[b.status] || b.status}</td>

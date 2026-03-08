@@ -744,6 +744,20 @@ body {
 .gender-badge.female  { background: #FDECF8; color: #C0399F; }
 .gender-badge.unknown { background: #F0F0F0; color: #999; }
 
+/* 房型徽章 */
+.room-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.room-badge-standard { background: #E8F4FD; color: #1565C0; border: 1px solid #BBDEFB; }
+.room-badge-luxury   { background: #FFF8E1; color: #BF6000; border: 1px solid #FFE082; }
+.room-badge-other    { background: #F3F0FF; color: #5B21B6; border: 1px solid #DDD6FE; }
+.room-badge-unknown  { background: #F0F0F0; color: #999;    border: 1px solid #E0E0E0; }
+
 /* 可点击文字 */
 .link-text {
   cursor: pointer;

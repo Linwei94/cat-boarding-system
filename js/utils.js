@@ -14,6 +14,12 @@ export function formatCurrency(amount) {
   return 'A$' + parseFloat(amount || 0).toFixed(2);
 }
 
+export function roomBadge(name) {
+  if (!name) return '<span class="room-badge room-badge-unknown">未知</span>';
+  const key = name.includes('豪华') ? 'luxury' : name.includes('标准') ? 'standard' : 'other';
+  return `<span class="room-badge room-badge-${key}">${name}</span>`;
+}
+
 export function genderBadge(gender) {
   if (gender === 'male')   return '<span class="gender-badge male">♂ 公</span>';
   if (gender === 'female') return '<span class="gender-badge female">♀ 母</span>';
