@@ -284,6 +284,67 @@ body {
 .visit-card-info { font-size: 12px; color: #555; margin-top: 4px; }
 
 /* ================================================================
+   本周预览
+   ================================================================ */
+.week-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+.week-day-col {
+  background: #FAFAF8;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  min-height: 80px;
+  transition: background 0.15s;
+}
+
+.week-day-col:hover { background: #FFF5F2; }
+.week-day-empty { opacity: 0.45; }
+
+.week-day-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.week-day-date {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.week-cat-chip {
+  display: block;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.week-no-cats {
+  color: #CCC;
+  font-size: 18px;
+  display: block;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .week-preview-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ================================================================
    数据表格
    ================================================================ */
 .table-container {

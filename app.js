@@ -246,6 +246,7 @@ function updateHomeVisitStats() {
 function renderAll() {
   populateDropdowns();
   renderTodaysCats();
+  renderUpcomingWeek();
   renderBoardingsTable();
   renderTodaysVisits();
   renderHomeVisitsTable();
@@ -254,6 +255,38 @@ function renderAll() {
   renderRoomTypesTable();
   updateBoardingStats();
   updateHomeVisitStats();
+}
+
+// 本周预览（明天起 6 天，只显示猫咪名字）
+function renderUpcomingWeek() {
+  const container = document.getElementById('upcoming-week-list');
+  const todayDate = new Date(getToday() + 'T00:00:00');
+  const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+
+  container.innerHTML = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(todayDate);
+    d.setDate(d.getDate() + i + 1);
+    const dateStr = d.toLocaleDateString('en-CA');
+    const label = '周' + dayNames[d.getDay()];
+    const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
+
+    const cats = state.boardings.filter(b =>
+      b.status === 'active' &&
+      b.check_in_date <= dateStr &&
+      b.check_out_date > dateStr
+    );
+
+    const chipsHtml = cats.length > 0
+      ? cats.map(b => `<span class="week-cat-chip">🐱 ${b.cat?.name || '未知'}</span>`).join('')
+      : '<span class="week-no-cats">—</span>';
+
+    return `
+      <div class="week-day-col ${cats.length === 0 ? 'week-day-empty' : ''}">
+        <div class="week-day-name">${label}</div>
+        <div class="week-day-date">${dateLabel}</div>
+        ${chipsHtml}
+      </div>`;
+  }).join('');
 }
 
 // 今日寄养猫咪卡片
