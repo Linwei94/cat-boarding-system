@@ -64,11 +64,11 @@
           <div class="stat-label">今日寄养猫咪</div>
         </div>
       </div>
-      <div class="stat-card success">
+      <div class="stat-card success clickable" onclick="openTodayChart()" title="点击查看今日收入占比">
         <div class="stat-icon">💰</div>
         <div class="stat-info">
           <div class="stat-number" id="today-boarding-income">-</div>
-          <div class="stat-label">今日寄养收入</div>
+          <div class="stat-label">今日寄养收入 🥧</div>
         </div>
       </div>
       <div class="stat-card warning clickable" onclick="openMonthChart()" title="点击查看本月每日收入">
@@ -165,11 +165,11 @@
           <div class="stat-label">今日上门次数</div>
         </div>
       </div>
-      <div class="stat-card success">
+      <div class="stat-card success clickable" onclick="openTodayChart()" title="点击查看今日收入占比">
         <div class="stat-icon">💰</div>
         <div class="stat-info">
           <div class="stat-number" id="today-visit-income">-</div>
-          <div class="stat-label">今日上门收入</div>
+          <div class="stat-label">今日上门收入 🥧</div>
         </div>
       </div>
       <div class="stat-card warning clickable" onclick="openMonthChart()" title="点击查看本月每日收入">
@@ -670,6 +670,19 @@
         <button type="submit" class="btn btn-primary">保存</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- 今日收入饼图弹窗 -->
+<div id="today-pie-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideModal('today-pie-modal')">
+  <div class="modal-content" style="max-width:420px;width:95%">
+    <div class="modal-header">
+      <h3 id="pie-chart-modal-title">今日收入</h3>
+      <button class="modal-close" onclick="hideModal('today-pie-modal')">✕</button>
+    </div>
+    <div style="position:relative;height:300px;padding:12px 0">
+      <canvas id="today-pie-chart"></canvas>
+    </div>
   </div>
 </div>
 
