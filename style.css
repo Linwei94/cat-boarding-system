@@ -192,6 +192,8 @@ body {
 .stat-card.success { border-color: var(--success); }
 .stat-card.warning { border-color: var(--warning); }
 .stat-card.info { border-color: var(--info); }
+.stat-card.clickable { cursor: pointer; }
+.stat-card.clickable:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 
 .stat-icon { font-size: 40px; }
 .stat-info { flex: 1; min-width: 0; }

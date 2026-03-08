@@ -12,6 +12,7 @@ export function openCatDetail(catId) {
   const owner = state.owners.find(o => o.id === c.owner_id);
 
   document.getElementById('cat-detail-name').innerHTML = c.name + ' ' + genderBadge(c.gender);
+  document.getElementById('cat-detail-edit-btn').onclick = () => { hideModal('cat-detail-modal'); openEditCat(catId); };
 
   const infoItems = [
     ['🐾 品种', c.breed || '-'],

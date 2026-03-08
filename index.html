@@ -71,18 +71,18 @@
           <div class="stat-label">今日寄养收入</div>
         </div>
       </div>
-      <div class="stat-card warning">
+      <div class="stat-card warning clickable" onclick="openMonthChart()" title="点击查看本月每日收入">
         <div class="stat-icon">📅</div>
         <div class="stat-info">
           <div class="stat-number" id="month-boarding-income">-</div>
-          <div class="stat-label">本月寄养收入</div>
+          <div class="stat-label">本月寄养收入 📈</div>
         </div>
       </div>
-      <div class="stat-card info">
+      <div class="stat-card info clickable" onclick="openYearChart()" title="点击查看今年每月收入">
         <div class="stat-icon">📊</div>
         <div class="stat-info">
           <div class="stat-number" id="year-boarding-income">-</div>
-          <div class="stat-label">今年寄养收入</div>
+          <div class="stat-label">今年寄养收入 📈</div>
         </div>
       </div>
     </div>
@@ -172,18 +172,18 @@
           <div class="stat-label">今日上门收入</div>
         </div>
       </div>
-      <div class="stat-card warning">
+      <div class="stat-card warning clickable" onclick="openMonthChart()" title="点击查看本月每日收入">
         <div class="stat-icon">📅</div>
         <div class="stat-info">
           <div class="stat-number" id="month-visit-income">-</div>
-          <div class="stat-label">本月上门收入</div>
+          <div class="stat-label">本月上门收入 📈</div>
         </div>
       </div>
-      <div class="stat-card info">
+      <div class="stat-card info clickable" onclick="openYearChart()" title="点击查看今年每月收入">
         <div class="stat-icon">📊</div>
         <div class="stat-info">
           <div class="stat-number" id="year-visit-income">-</div>
-          <div class="stat-label">今年上门收入</div>
+          <div class="stat-label">今年上门收入 📈</div>
         </div>
       </div>
     </div>
@@ -243,7 +243,7 @@
         <div class="section-header" style="margin-bottom:0">
           <div>
             <h2>🎭 演示数据</h2>
-            <p style="font-size:13px;color:#888;margin-top:4px">载入 5 位主人、8 只猫咪、12 笔寄养记录及上门喂养安排（可重复点击，不会重复写入）</p>
+            <p style="font-size:13px;color:#888;margin-top:4px">载入 5 位主人、8 只猫咪、25 笔寄养、6 笔上门喂养（跨越 1-3 月，含图表数据）（可重复点击，不会重复写入）</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="btn btn-primary" onclick="loadDemoData()">载入演示数据</button>
@@ -331,7 +331,10 @@
   <div class="modal-content modal-large">
     <div class="modal-header">
       <h3 id="owner-detail-name">主人详情</h3>
-      <button class="modal-close" onclick="hideModal('owner-detail-modal')">✕</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-secondary btn-sm" id="owner-detail-edit-btn" onclick="">✏️ 编辑</button>
+        <button class="modal-close" onclick="hideModal('owner-detail-modal')">✕</button>
+      </div>
     </div>
     <div style="padding:24px">
       <!-- 基本信息 -->
@@ -354,7 +357,10 @@
   <div class="modal-content modal-large">
     <div class="modal-header">
       <h3 id="cat-detail-name">猫咪详情</h3>
-      <button class="modal-close" onclick="hideModal('cat-detail-modal')">✕</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-secondary btn-sm" id="cat-detail-edit-btn" onclick="">✏️ 编辑</button>
+        <button class="modal-close" onclick="hideModal('cat-detail-modal')">✕</button>
+      </div>
     </div>
     <div style="padding:24px">
       <div class="detail-info-grid" id="cat-detail-info"></div>
@@ -667,6 +673,19 @@
   </div>
 </div>
 
+<!-- 收入图表弹窗 -->
+<div id="income-chart-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideModal('income-chart-modal')">
+  <div class="modal-content" style="max-width:760px;width:95%">
+    <div class="modal-header">
+      <h3 id="chart-modal-title">收入图表</h3>
+      <button class="modal-close" onclick="hideModal('income-chart-modal')">✕</button>
+    </div>
+    <div style="position:relative;height:340px;padding:8px 0">
+      <canvas id="income-chart"></canvas>
+    </div>
+  </div>
+</div>
+
 <!-- Toast 通知 -->
 <div id="toast" class="toast"></div>
 
@@ -676,6 +695,8 @@
   <p>加载中...</p>
 </div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <!-- Supabase JS SDK (必须在模块之前加载) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- 主应用模块 -->

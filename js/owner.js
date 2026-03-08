@@ -12,12 +12,21 @@ export function openOwnerDetail(ownerId) {
   if (!o) return;
 
   document.getElementById('owner-detail-name').textContent = o.name + ' 的资料';
+  const editBtn = document.getElementById('owner-detail-edit-btn');
+  editBtn.onclick = () => { hideModal('owner-detail-modal'); openEditOwner(ownerId); };
+
+  const mapsUrl = o.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`
+    : null;
+  const addressHtml = o.address
+    ? `<a href="${mapsUrl}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline dotted">${o.address} 📍</a>`
+    : '-';
 
   const infoItems = [
     ['📞 电话', o.phone || '-'],
     ['💬 微信', o.wechat ? `<span style="color:#07C160">${o.wechat}</span>` : '-'],
     ['📧 邮箱', o.email || '-'],
-    ['📍 地址', o.address || '-'],
+    ['📍 地址', addressHtml],
     ['📝 备注', o.notes || '-'],
   ];
   document.getElementById('owner-detail-info').innerHTML = infoItems.map(([label, val]) =>

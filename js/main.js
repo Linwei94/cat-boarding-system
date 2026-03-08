@@ -23,6 +23,7 @@ import { openAddHomeVisit, openEditHomeVisit, deleteHomeVisit,
          onVisitOwnerChange, initHomeVisitForm } from './homevisit.js';
 
 import { loadDemoData, clearDemoData } from './demo.js';
+import { openMonthChart, openYearChart } from './charts.js';
 
 // ── 暴露到 window（供 HTML onclick 调用）────────────────────────
 Object.assign(window, {
@@ -42,6 +43,8 @@ Object.assign(window, {
   hideModal,
   // 演示数据
   loadDemoData, clearDemoData,
+  // 图表
+  openMonthChart, openYearChart,
   // 供 render.js 内部调用
   __renderModule: { renderBoardingsTable },
 });
