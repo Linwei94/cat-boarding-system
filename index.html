@@ -265,7 +265,6 @@
                 <th>姓名</th>
                 <th>电话</th>
                 <th>微信</th>
-                <th>折扣</th>
                 <th>猫咪</th>
                 <th>操作</th>
               </tr>
@@ -478,16 +477,16 @@
           <input type="text" id="owner-wechat" placeholder="微信号（选填）">
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>折扣率（%）</label>
-          <input type="number" id="owner-discount" min="0" max="100" step="0.1" value="0" placeholder="0">
-          <small>0 = 不打折｜10 = 九折｜20 = 八折｜50 = 五折</small>
+      <div class="form-group">
+        <label>地址</label>
+        <input type="text" id="owner-address" placeholder="家庭地址（选填）">
+      </div>
+      <div class="form-group">
+        <label>专属房型价格</label>
+        <div id="owner-room-prices-inputs" style="margin-top:8px">
+          <p style="color:#aaa;font-size:13px;padding:6px 0">正在加载房型...</p>
         </div>
-        <div class="form-group">
-          <label>地址</label>
-          <input type="text" id="owner-address" placeholder="家庭地址（选填）">
-        </div>
+        <small>留空 = 使用该房型的默认价格，填入自定义价格后将覆盖默认值</small>
       </div>
       <div class="form-group">
         <label>备注</label>
@@ -677,9 +676,9 @@
   <p>加载中...</p>
 </div>
 
-<!-- Supabase JS SDK -->
+<!-- Supabase JS SDK (必须在模块之前加载) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- 主应用逻辑 -->
-<script src="app.js"></script>
+<!-- 主应用模块 -->
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
