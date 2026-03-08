@@ -248,6 +248,14 @@ body {
   padding: 16px;
   transition: transform 0.15s;
 }
+.cat-card.room-standard {
+  background: linear-gradient(135deg, #EBF5FB, #D6EAF8);
+  border-color: #AED6F1;
+}
+.cat-card.room-luxury {
+  background: linear-gradient(135deg, #FFFDE7, #FFF8D6);
+  border-color: #FFE082;
+}
 
 .cat-card:hover { transform: translateY(-2px); }
 .cat-card-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
@@ -334,6 +342,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.week-cat-chip.room-standard { background: #D6EAF8; color: #1565C0; }
+.week-cat-chip.room-luxury   { background: #FFF3C4; color: #BF6000; }
 
 .week-no-cats {
   color: #CCC;

@@ -1,5 +1,12 @@
 import { state } from './state.js';
 import { getToday, formatDateCN, formatCurrency, genderBadge, roomBadge, daysBetween } from './utils.js';
+
+function roomClass(name) {
+  if (!name) return '';
+  if (name.includes('豪华')) return 'room-luxury';
+  if (name.includes('标准')) return 'room-standard';
+  return '';
+}
 import { getTodaysBoardings, updateBoardingStats, updateHomeVisitStats } from './stats.js';
 
 // ── 下拉菜单 ────────────────────────────────────────────────────
@@ -27,7 +34,7 @@ export function renderTodaysCats() {
   container.innerHTML = todaysCats.map(b => {
     const cat = state.cats.find(c => c.id === b.cat_id);
     return `
-      <div class="cat-card" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">
+      <div class="cat-card ${roomClass(b.room_type?.name)}" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">
         <div class="cat-card-name">🐱 ${b.cat?.name || '未知'} ${cat ? genderBadge(cat.gender) : ''}</div>
         <div class="cat-card-info link-text" onclick="event.stopPropagation();window.openOwnerDetail('${b.owner_id}')">主人：${b.owner?.name || '未知'}</div>
         <div class="cat-card-info">入住：${formatDateCN(b.check_in_date)}</div>
@@ -59,7 +66,7 @@ export function renderUpcomingWeek() {
       ? cats.map(b => {
           const cat = state.cats.find(c => c.id === b.cat_id);
           const sym = cat?.gender === 'male' ? '♂' : cat?.gender === 'female' ? '♀' : '';
-          return `<span class="week-cat-chip" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">${sym} ${b.cat?.name || '未知'}</span>`;
+          return `<span class="week-cat-chip ${roomClass(b.room_type?.name)}" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">${sym} ${b.cat?.name || '未知'}</span>`;
         }).join('')
       : '<span class="week-no-cats">—</span>';
 
