@@ -230,6 +230,20 @@
   <div id="settings-tab" class="tab-content">
     <div class="settings-grid">
 
+      <!-- 演示数据 -->
+      <div class="settings-section" style="border:2px dashed #FF6B6B;background:#FFF8F5">
+        <div class="section-header" style="margin-bottom:0">
+          <div>
+            <h2>🎭 演示数据</h2>
+            <p style="font-size:13px;color:#888;margin-top:4px">载入 5 位主人、8 只猫咪、12 笔寄养记录及上门喂养安排（可重复点击，不会重复写入）</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-primary" onclick="loadDemoData()">载入演示数据</button>
+            <button class="btn btn-danger btn-sm" onclick="clearDemoData()">清除演示数据</button>
+          </div>
+        </div>
+      </div>
+
       <!-- 主人管理 -->
       <div class="settings-section">
         <div class="section-header">
