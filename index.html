@@ -674,26 +674,28 @@
 </div>
 
 <!-- 今日收入饼图弹窗 -->
-<div id="today-pie-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideModal('today-pie-modal')">
+<div id="today-pie-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('today-pie-modal')"></div>
   <div class="modal-content" style="max-width:420px;width:95%">
     <div class="modal-header">
       <h3 id="pie-chart-modal-title">今日收入</h3>
       <button class="modal-close" onclick="hideModal('today-pie-modal')">✕</button>
     </div>
-    <div style="position:relative;height:300px;padding:12px 0">
+    <div style="position:relative;height:300px;padding:12px 16px">
       <canvas id="today-pie-chart"></canvas>
     </div>
   </div>
 </div>
 
 <!-- 收入图表弹窗 -->
-<div id="income-chart-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideModal('income-chart-modal')">
-  <div class="modal-content" style="max-width:760px;width:95%">
+<div id="income-chart-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('income-chart-modal')"></div>
+  <div class="modal-content" style="max-width:780px;width:95%">
     <div class="modal-header">
       <h3 id="chart-modal-title">收入图表</h3>
       <button class="modal-close" onclick="hideModal('income-chart-modal')">✕</button>
     </div>
-    <div style="position:relative;height:340px;padding:8px 0">
+    <div style="position:relative;height:360px;padding:8px 16px 16px">
       <canvas id="income-chart"></canvas>
     </div>
   </div>
