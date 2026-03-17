@@ -3,7 +3,7 @@
 // ================================================================
 import { loadAllData } from './api.js';
 import { initAuth } from './auth.js';
-import { initTabs, showLoading, showToast, hideModal } from './ui.js';
+import { initTabs, initPullToRefresh, showLoading, showToast, hideModal } from './ui.js';
 import { renderAll, renderBoardingsTable } from './render.js';
 
 import { openAddBoarding, openEditBoarding, onBoardingOwnerChange,
@@ -57,14 +57,20 @@ initCatForm();
 initRoomTypeForm();
 initHomeVisitForm();
 
-initAuth(async () => {
+async function refresh() {
   showLoading(true);
   try {
     await loadAllData();
     renderAll();
+    showToast('已刷新 ✓', 'success');
   } catch (err) {
     console.error(err);
-    showToast('数据加载失败，请刷新页面重试', 'error');
+    showToast('刷新失败，请重试', 'error');
   }
   showLoading(false);
+}
+
+initAuth(async () => {
+  await refresh().catch(() => {});
+  initPullToRefresh(refresh);
 });

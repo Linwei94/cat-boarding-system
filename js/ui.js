@@ -31,6 +31,60 @@ function updatePillPosition(activeBtn) {
   if (idx >= 0) pill.style.setProperty('--pill-index', idx);
 }
 
+export function initPullToRefresh(onRefresh) {
+  const el = document.getElementById('app');
+  if (!el) return;
+
+  let startY = 0;
+  let pulling = false;
+  let indicator = null;
+
+  function getIndicator() {
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.id = 'ptr-indicator';
+      indicator.innerHTML = '<div class="ptr-spinner"></div>';
+      document.body.appendChild(indicator);
+    }
+    return indicator;
+  }
+
+  el.addEventListener('touchstart', e => {
+    if (el.scrollTop === 0 && !document.querySelector('.modal:not(.hidden)')) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) {
+      const progress = Math.min(dy / 80, 1);
+      const ind = getIndicator();
+      ind.style.opacity = progress;
+      ind.style.transform = `translateX(-50%) translateY(${Math.min(dy * 0.4, 32)}px)`;
+      ind.classList.toggle('ptr-ready', progress >= 1);
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchend', async e => {
+    if (!pulling) return;
+    pulling = false;
+    const dy = e.changedTouches[0].clientY - startY;
+    const ind = getIndicator();
+    if (dy >= 80) {
+      ind.classList.add('ptr-loading');
+      ind.style.opacity = 1;
+      ind.style.transform = 'translateX(-50%) translateY(20px)';
+      try { await onRefresh(); } catch (_) {}
+    }
+    ind.style.opacity = 0;
+    ind.style.transform = 'translateX(-50%) translateY(-40px)';
+    ind.classList.remove('ptr-ready', 'ptr-loading');
+  });
+}
+
 export function initTabs() {
   const bottomBtns = document.querySelectorAll('.bottom-nav .tab-btn');
   bottomBtns.forEach(btn => {
