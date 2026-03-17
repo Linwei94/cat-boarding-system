@@ -127,6 +127,36 @@ body {
   flex-shrink: 0;
 }
 
+/* 桌面端顶部 tabs */
+.desktop-tabs {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+
+.desktop-tabs .tab-btn {
+  padding: 0 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  color: var(--text-light);
+  transition: all 0.2s;
+  height: 100%;
+  white-space: nowrap;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.desktop-tabs .tab-btn:hover { color: var(--primary); }
+.desktop-tabs .tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
 /* 底部导航栏 */
 .bottom-nav {
   position: fixed;
@@ -915,11 +945,37 @@ body {
 /* ================================================================
    响应式
    ================================================================ */
+
+/* 桌面端：顶部 tabs 显示，底部导航隐藏 */
+@media (min-width: 769px) {
+  .bottom-nav { display: none; }
+  .desktop-tabs { display: flex; }
+  .tab-content {
+    padding-bottom: 32px;
+  }
+  /* 桌面端 header 高度 */
+  .app-header {
+    height: 62px;
+    padding-top: 0;
+  }
+  /* 桌面端表格悬停行更明显 */
+  .data-table tbody tr:hover td {
+    background: #FFF5F0;
+  }
+  /* 桌面端统计卡片悬停动效 */
+  .stat-card.clickable:active { transform: translateY(-1px); }
+  /* 桌面端弹窗居中，不贴底 */
+  .modal { padding: 24px; align-items: center; }
+  .modal-content { border-radius: 14px; }
+}
+
 @media (max-width: 1024px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* 移动端：隐藏顶部 tabs，显示底部导航 */
 @media (max-width: 768px) {
+  .desktop-tabs { display: none; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .tab-content { padding: 16px; padding-bottom: calc(16px + 56px + env(safe-area-inset-bottom)); }
@@ -927,10 +983,8 @@ body {
   .actions-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
   .cats-grid { grid-template-columns: 1fr 1fr; }
   .visits-grid { grid-template-columns: 1fr; }
-  /* 表格横向滚动 */
   .table-container { overflow-x: auto; }
   .data-table { min-width: 600px; }
-  /* 弹窗全屏 */
   .modal { padding: 0; align-items: flex-end; }
   .modal-content { border-radius: 14px 14px 0 0; max-height: 92vh; }
 }
@@ -941,11 +995,9 @@ body {
   .stat-icon { font-size: 30px; }
   .stat-number { font-size: 18px; }
   .cats-grid { grid-template-columns: 1fr; }
-  .app-logo span { display: none; }
-  .tab-btn { font-size: 12px; padding: 0 8px; }
+  .login-card { padding: 32px 24px; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 380px) {
   .stats-grid { grid-template-columns: 1fr; }
-  .login-card { padding: 32px 24px; }
 }
