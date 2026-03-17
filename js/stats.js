@@ -41,12 +41,23 @@ function getVisitIncome(startStr, endStr) {
     }, 0);
 }
 
+function fitStatNumbers() {
+  document.querySelectorAll('.stat-number').forEach(el => {
+    const len = el.textContent.replace(/\s/g, '').length;
+    if      (len > 10) el.style.fontSize = '13px';
+    else if (len > 8)  el.style.fontSize = '15px';
+    else if (len > 6)  el.style.fontSize = '18px';
+    else               el.style.fontSize = '';
+  });
+}
+
 export function updateBoardingStats() {
   const { today, tomorrow, monthStart, monthEnd, yearStart, yearEnd } = getPeriods();
-  document.getElementById('today-cats-count').textContent   = getTodaysBoardings().length + ' 只';
-  document.getElementById('today-boarding-income').textContent = formatCurrency(getBoardingIncome(today, tomorrow));
-  document.getElementById('month-boarding-income').textContent = formatCurrency(getBoardingIncome(monthStart, monthEnd));
-  document.getElementById('year-boarding-income').textContent  = formatCurrency(getBoardingIncome(yearStart, yearEnd));
+  document.getElementById('today-cats-count').textContent        = getTodaysBoardings().length + ' 只';
+  document.getElementById('today-boarding-income').textContent   = formatCurrency(getBoardingIncome(today, tomorrow));
+  document.getElementById('month-boarding-income').textContent   = formatCurrency(getBoardingIncome(monthStart, monthEnd));
+  document.getElementById('year-boarding-income').textContent    = formatCurrency(getBoardingIncome(yearStart, yearEnd));
+  fitStatNumbers();
 }
 
 export function updateHomeVisitStats() {
@@ -56,4 +67,5 @@ export function updateHomeVisitStats() {
   document.getElementById('today-visit-income').textContent  = formatCurrency(getVisitIncome(today, tomorrow));
   document.getElementById('month-visit-income').textContent  = formatCurrency(getVisitIncome(monthStart, monthEnd));
   document.getElementById('year-visit-income').textContent   = formatCurrency(getVisitIncome(yearStart, yearEnd));
+  fitStatNumbers();
 }
