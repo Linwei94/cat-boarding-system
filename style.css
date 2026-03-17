@@ -8,6 +8,13 @@
   padding: 0;
 }
 
+html {
+  overflow: hidden;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+
 :root {
   --primary: #FF6B6B;
   --primary-dark: #EE5A24;
@@ -36,6 +43,11 @@ body {
   color: var(--text);
   font-size: 14px;
   line-height: 1.5;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ================================================================
@@ -467,8 +479,10 @@ body {
   background: white;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin-bottom: 24px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-filters {
@@ -479,6 +493,7 @@ body {
 
 .data-table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   font-size: 14px;
 }
