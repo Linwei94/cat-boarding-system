@@ -377,18 +377,22 @@ body {
 /* 横向滑动卡片条（modal 内旗下猫咪等） */
 .hscroll-strip {
   display: flex;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 12px;
   overflow-x: auto;
-  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 6px;
-  /* 隐藏滚动条但保留功能 */
   scrollbar-width: none;
+  /* 逃出父级 padding，做全宽横滑（和 App Store 同款做法） */
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 10px;
 }
 .hscroll-strip::-webkit-scrollbar { display: none; }
 .hscroll-card {
-  flex: 0 0 150px;
-  min-width: 150px;
+  flex: 0 0 160px;
+  min-width: 160px;
 }
 
 .cat-card {
@@ -719,17 +723,23 @@ body {
   max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip 视觉溢出但不阻止子元素建立自己的滚动容器 */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   box-shadow: 0 24px 64px rgba(180,60,40,0.18);
   animation: modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* modal 内的表格允许横向滑动 */
+/* modal 内的表格：全宽逃出 padding，横向可滑 */
 .modal-content .table-container {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  margin-left: -24px;
+  margin-right: -24px;
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 .modal-overlay {
   animation: overlayIn 0.2s ease;
