@@ -23,13 +23,38 @@ export function showToast(message, type = 'success') {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+function updatePillPosition(activeBtn) {
+  const pill = document.querySelector('.bottom-nav-pill');
+  if (!pill) return;
+  const btns = [...pill.querySelectorAll('.tab-btn')];
+  const idx = btns.indexOf(activeBtn);
+  if (idx >= 0) pill.style.setProperty('--pill-index', idx);
+}
+
 export function initTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  const bottomBtns = document.querySelectorAll('.bottom-nav .tab-btn');
+  bottomBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+      updatePillPosition(btn);
     });
   });
+  // Also sync desktop tabs
+  document.querySelectorAll('.desktop-tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+      // sync bottom nav pill
+      const matching = document.querySelector(`.bottom-nav .tab-btn[data-tab="${btn.dataset.tab}"]`);
+      if (matching) updatePillPosition(matching);
+    });
+  });
+  // Set initial pill position
+  const activeBottomBtn = document.querySelector('.bottom-nav .tab-btn.active');
+  if (activeBottomBtn) updatePillPosition(activeBottomBtn);
 }
