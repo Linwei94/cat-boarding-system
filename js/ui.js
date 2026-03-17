@@ -1,9 +1,13 @@
 export function showModal(id) {
   document.getElementById(id).classList.remove('hidden');
+  document.getElementById('app').style.overflow = 'hidden';
 }
 
 export function hideModal(id) {
   document.getElementById(id).classList.add('hidden');
+  // restore scroll only if no other modal is open
+  const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
+  if (!anyOpen) document.getElementById('app').style.overflow = '';
 }
 
 export function showLoading(show) {
