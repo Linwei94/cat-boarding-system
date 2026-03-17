@@ -338,7 +338,7 @@ body {
   background: linear-gradient(135deg, #FFF5F3, #FFE8E4);
   border: 1px solid #FFD4C8;
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 12px;
   transition: transform 0.15s;
 }
 .cat-card.room-standard {
@@ -836,12 +836,15 @@ body {
    性别标签
    ================================================================ */
 .gender-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   padding: 1px 7px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 700;
   vertical-align: middle;
+  line-height: 1.4;
 }
 .gender-badge.male    { background: #EBF5FB; color: #2980B9; }
 .gender-badge.female  { background: #FDECF8; color: #C0399F; }
@@ -1023,7 +1026,7 @@ body {
   .tab-content { padding: 16px; padding-bottom: calc(16px + 56px + env(safe-area-inset-bottom)); }
   .app-header { padding: 0 12px; padding-top: env(safe-area-inset-top); gap: 8px; }
   .actions-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .cats-grid { grid-template-columns: 1fr 1fr; }
+  .cats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .visits-grid { grid-template-columns: 1fr; }
   .table-container { overflow-x: auto; }
   .data-table { min-width: 600px; }
@@ -1036,10 +1039,14 @@ body {
   .stat-card { padding: 14px; }
   .stat-icon { font-size: 30px; }
   .stat-number { font-size: 18px; }
-  .cats-grid { grid-template-columns: 1fr; }
+  .cats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .login-card { padding: 32px 24px; }
 }
 
 @media (max-width: 380px) {
   .stats-grid { grid-template-columns: 1fr; }
+  .cats-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .cat-card { padding: 10px; }
+  .cat-card-name { font-size: 13px; }
+  .cat-card-info { font-size: 11px; }
 }
