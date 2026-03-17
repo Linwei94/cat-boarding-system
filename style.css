@@ -484,30 +484,46 @@ body {
 }
 
 .cat-card {
-  background: var(--surface);
-  border: 1px solid var(--separator);
-  border-radius: var(--radius);
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 18px;
   padding: 14px;
   transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
 }
-.cat-card.room-standard { border-top: 3px solid #007AFF; }
-.cat-card.room-luxury   { border-top: 3px solid #FF9F0A; }
-.cat-card:not(.room-standard):not(.room-luxury) { border-top: 3px solid var(--primary); }
 
-.cat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.cat-card-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; letter-spacing: -0.1px; }
-.cat-card-info { font-size: 12px; color: var(--text-light); margin-top: 3px; font-weight: 500; }
+/* Subtle left color accent stripe */
+.cat-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 18px 0 0 18px;
+  background: var(--primary);
+}
+.cat-card.room-standard::before { background: #007AFF; }
+.cat-card.room-luxury::before   { background: #FF9F0A; }
+
+/* Subtle tinted bg */
+.cat-card.room-standard { background: #F5F9FF; }
+.cat-card.room-luxury   { background: #FFFBF2; }
+
+.cat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
+.cat-card-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; letter-spacing: -0.1px; padding-left: 6px; }
+.cat-card-info { font-size: 12px; color: var(--text-light); margin-top: 3px; font-weight: 500; padding-left: 6px; }
 
 .cat-card-room {
   display: inline-block;
-  background: var(--primary-light);
-  color: var(--primary);
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 11px;
   margin-top: 10px;
+  margin-left: 6px;
   font-weight: 700;
+  background: rgba(0,0,0,0.06);
+  color: var(--text-light);
 }
 
 /* ================================================================
@@ -582,8 +598,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.week-cat-chip.room-standard { background: var(--info-light); color: var(--info); }
-.week-cat-chip.room-luxury   { background: var(--warning-light); color: var(--warning); }
+.week-cat-chip.room-standard { background: rgba(0,122,255,0.12); color: #007AFF; }
+.week-cat-chip.room-luxury   { background: rgba(255,159,10,0.14); color: #B8720A; }
 
 .week-no-cats {
   color: #CCC;

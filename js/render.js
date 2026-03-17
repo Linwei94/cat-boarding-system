@@ -4,17 +4,11 @@ import { getToday, formatDateCN, formatCurrency, genderBadge, roomBadge, daysBet
 import { getTodaysBoardings, updateBoardingStats, updateHomeVisitStats } from './stats.js';
 
 function roomCardStyle(name) {
-  if (!name) return '';
-  if (name.includes('豪华')) return 'background:linear-gradient(135deg,#FFFDE7,#FFE57F);border-color:#FFD54F;';
-  if (name.includes('标准')) return 'background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-color:#64B5F6;';
-  return '';
+  return '';  // handled by CSS class
 }
 
 function roomChipStyle(name) {
-  if (!name) return '';
-  if (name.includes('豪华')) return 'background:#FFE57F;color:#7B5200;';
-  if (name.includes('标准')) return 'background:#90CAF9;color:#0D47A1;';
-  return '';
+  return '';  // handled by CSS class
 }
 
 // ── 下拉菜单 ────────────────────────────────────────────────────
