@@ -256,13 +256,13 @@
     <div class="settings-grid">
 
       <!-- 演示数据 -->
-      <div class="settings-section" style="border:2px dashed #FF6B6B;background:#FFF8F5">
-        <div class="section-header" style="margin-bottom:0">
+      <div class="settings-section demo-card">
+        <div class="section-header" style="margin-bottom:0;flex-wrap:wrap;gap:12px">
           <div>
             <h2>🎭 演示数据</h2>
-            <p style="font-size:13px;color:#888;margin-top:4px">载入 5 位主人、8 只猫咪、25 笔寄养、6 笔上门喂养（跨越 1-3 月，含图表数据）（可重复点击，不会重复写入）</p>
+            <p class="demo-card-desc">载入 8 位主人、14 只猫咪、52 笔寄养、8 笔上门喂养（跨越 1-3 月，含图表数据）可重复点击，不会重复写入</p>
           </div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
             <button class="btn btn-primary" onclick="loadDemoData()">载入演示数据</button>
             <button class="btn btn-danger btn-sm" onclick="clearDemoData()">清除演示数据</button>
           </div>
@@ -439,7 +439,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>折扣后日费（元）</label>
+          <label>折扣后日费（A$）</label>
           <input type="number" id="boarding-daily-rate" step="0.01" readonly placeholder="自动计算">
           <small>根据主人折扣自动计算</small>
         </div>
@@ -460,7 +460,7 @@
           <input type="number" id="boarding-days" readonly placeholder="自动计算">
         </div>
         <div class="form-group">
-          <label>总价（元）</label>
+          <label>总价（A$）</label>
           <input type="number" id="boarding-total-price" step="0.01" placeholder="自动计算，可修改">
         </div>
       </div>
@@ -580,8 +580,8 @@
           <label>性别</label>
           <select id="cat-gender">
             <option value="unknown">未知</option>
-            <option value="male">公</option>
-            <option value="female">母</option>
+            <option value="male">弟弟（公猫）</option>
+            <option value="female">妹妹（母猫）</option>
           </select>
         </div>
         <div class="form-group">
@@ -639,8 +639,8 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>每次价格（元）</label>
-          <input type="number" id="homevisit-price" step="0.01" value="0" min="0">
+          <label>每次价格（A$）</label>
+          <input type="number" id="homevisit-price" step="0.01" placeholder="0.00" min="0">
         </div>
         <div class="form-group">
           <label>状态</label>
@@ -697,7 +697,7 @@
         <textarea id="room-type-description" rows="3" placeholder="房型说明、包含服务等"></textarea>
       </div>
       <div class="form-group">
-        <label>每日价格（元）*</label>
+        <label>每日价格（A$）*</label>
         <input type="number" id="room-type-price" required step="0.01" min="0" placeholder="0.00">
       </div>
       <div class="modal-footer">

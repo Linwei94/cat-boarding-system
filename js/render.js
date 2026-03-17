@@ -3,12 +3,11 @@ import { getToday, formatDateCN, formatCurrency, genderBadge, roomBadge, daysBet
 
 import { getTodaysBoardings, updateBoardingStats, updateHomeVisitStats } from './stats.js';
 
-function roomCardStyle(name) {
-  return '';  // handled by CSS class
-}
-
-function roomChipStyle(name) {
-  return '';  // handled by CSS class
+function roomClass(name) {
+  if (!name) return '';
+  if (name.includes('豪华')) return 'room-luxury';
+  if (name.includes('标准')) return 'room-standard';
+  return '';
 }
 
 // ── 下拉菜单 ────────────────────────────────────────────────────
@@ -36,7 +35,7 @@ export function renderTodaysCats() {
   container.innerHTML = todaysCats.map(b => {
     const cat = state.cats.find(c => c.id === b.cat_id);
     return `
-      <div class="cat-card" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer;${roomCardStyle(b.room_type?.name)}">
+      <div class="cat-card ${roomClass(b.room_type?.name)}" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">
         <div class="cat-card-name">🐱 ${b.cat?.name || '未知'} ${cat ? genderBadge(cat.gender) : ''}</div>
         <div class="cat-card-info link-text" onclick="event.stopPropagation();window.openOwnerDetail('${b.owner_id}')">主人：${b.owner?.name || '未知'}</div>
         <div class="cat-card-info">入住：${formatDateCN(b.check_in_date)}</div>
@@ -67,8 +66,7 @@ export function renderUpcomingWeek() {
     const chipsHtml = cats.length > 0
       ? cats.map(b => {
           const cat = state.cats.find(c => c.id === b.cat_id);
-          const sym = cat?.gender === 'male' ? '♂' : cat?.gender === 'female' ? '♀' : '';
-          return `<span class="week-cat-chip" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer;${roomChipStyle(b.room_type?.name)}">${sym} ${b.cat?.name || '未知'}</span>`;
+          return `<span class="week-cat-chip ${roomClass(b.room_type?.name)}" onclick="window.openCatDetail('${b.cat_id}')" style="cursor:pointer">${b.cat?.name || '未知'}</span>`;
         }).join('')
       : '<span class="week-no-cats">—</span>';
 

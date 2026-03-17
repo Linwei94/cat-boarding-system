@@ -91,8 +91,7 @@ export function openHomeVisitDetail(visitId) {
   document.getElementById('hv-detail-title').textContent = owner ? `${owner.name} 的上门喂养` : '上门喂养详情';
   document.getElementById('hv-detail-edit-btn').onclick = () => { hideModal('homevisit-detail-modal'); openEditHomeVisit(visitId); };
 
-  // Map link — opens Apple Maps on iOS, Google Maps elsewhere
-  const mapUrl = `https://maps.apple.com/?q=${encodeURIComponent(v.address)}`;
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}`;
   const addressHtml = v.address
     ? `<a href="${mapUrl}" target="_blank" class="link-text" style="display:inline-flex;align-items:center;gap:4px">📍 ${v.address}</a>`
     : '-';
@@ -131,7 +130,7 @@ export function openAddHomeVisit() {
   document.getElementById('homevisit-modal-title').textContent = '新增上门喂养';
   document.getElementById('homevisit-form').reset();
   document.getElementById('homevisit-id').value    = '';
-  document.getElementById('homevisit-price').value = 0;
+  document.getElementById('homevisit-price').value = '';
   document.getElementById('homevisit-cat').innerHTML = '<option value="">全部猫咪 / 不指定</option>';
   document.getElementById('homevisit-dates').value   = '[]';
   document.getElementById('selected-dates-text').innerHTML = '请在上方点击日期选择';
