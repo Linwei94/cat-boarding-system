@@ -116,11 +116,53 @@ body {
 }
 
 .app-logo {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary);
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex-shrink: 0;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.app-logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #FF8C8C, #FF6B6B);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(255,107,107,0.35);
+  flex-shrink: 0;
+}
+
+.app-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.app-logo-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.app-logo-sub {
+  font-size: 10px;
+  color: var(--text-light);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .app-logo-sub { display: none; }
+  .app-logo-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 10px; }
+  .app-logo-name { font-size: 15px; }
 }
 
 .header-right {
