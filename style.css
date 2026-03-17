@@ -142,7 +142,7 @@ body {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border-bottom: 1px solid var(--border);
-  padding: 0 16px;
+  padding: 0 20px;
   padding-top: env(safe-area-inset-top);
   display: flex;
   align-items: center;
@@ -151,7 +151,7 @@ body {
   top: 0;
   z-index: 100;
   box-shadow: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.06);
-  height: calc(62px + env(safe-area-inset-top));
+  height: calc(72px + env(safe-area-inset-top));
 }
 
 /* 移动端居中标题 */
@@ -1309,7 +1309,7 @@ body {
   }
   /* 桌面端 header 高度 */
   .app-header {
-    height: 68px;
+    height: 72px;
     padding-top: 0;
   }
   /* 桌面端表格悬停行更明显 */
