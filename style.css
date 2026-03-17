@@ -9,7 +9,6 @@
 }
 
 html {
-  overflow: hidden;
   height: 100%;
   overscroll-behavior: none;
 }
@@ -46,8 +45,6 @@ body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* ================================================================
@@ -105,9 +102,13 @@ body {
    主应用布局
    ================================================================ */
 #app {
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 顶部导航 */
