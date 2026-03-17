@@ -102,15 +102,17 @@ body {
 .app-header {
   background: white;
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
+  padding: 0 16px;
+  padding-top: env(safe-area-inset-top);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  height: 60px;
+  height: calc(56px + env(safe-area-inset-top));
 }
 
 .app-logo {
@@ -121,41 +123,60 @@ body {
   flex-shrink: 0;
 }
 
-.tabs {
-  display: flex;
-  flex: 1;
-  height: 100%;
+.header-right {
+  flex-shrink: 0;
 }
 
-.tab-btn {
-  padding: 0 20px;
+/* 底部导航栏 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.07);
+}
+
+.bottom-nav .tab-btn {
+  flex: 1;
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  border-bottom: 3px solid transparent;
+  font-family: inherit;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
   color: var(--text-light);
-  transition: all 0.2s;
-  height: 100%;
-  white-space: nowrap;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 56px;
 }
 
-.tab-btn:hover { color: var(--primary); }
-.tab-btn.active {
+.bottom-nav .tab-btn.active {
   color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 700;
 }
 
-.header-right {
-  flex-shrink: 0;
+.bottom-nav-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.bottom-nav-label {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 /* Tab 内容区 */
 .tab-content {
   display: none;
   padding: 24px;
+  padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
   max-width: 1440px;
   margin: 0 auto;
   width: 100%;
@@ -817,8 +838,8 @@ body {
    ================================================================ */
 .toast {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  right: 16px;
   background: #2D2D2D;
   color: white;
   padding: 13px 20px;
@@ -901,9 +922,8 @@ body {
 @media (max-width: 768px) {
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .tab-content { padding: 16px; }
-  .app-header { padding: 0 12px; gap: 8px; }
-  .tab-btn { padding: 0 12px; font-size: 13px; }
+  .tab-content { padding: 16px; padding-bottom: calc(16px + 56px + env(safe-area-inset-bottom)); }
+  .app-header { padding: 0 12px; padding-top: env(safe-area-inset-top); gap: 8px; }
   .actions-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
   .cats-grid { grid-template-columns: 1fr 1fr; }
   .visits-grid { grid-template-columns: 1fr; }

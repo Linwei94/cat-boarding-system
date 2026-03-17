@@ -2,7 +2,14 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="喵喵寄养">
+  <meta name="theme-color" content="#FF6B6B">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
   <title>喵喵寄养管理系统</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -40,11 +47,6 @@
   <!-- 顶部导航 -->
   <header class="app-header">
     <span class="app-logo">🐱 喵喵寄养</span>
-    <nav class="tabs">
-      <button class="tab-btn active" data-tab="boarding">🏠 猫咪寄养</button>
-      <button class="tab-btn" data-tab="homevisit">🚗 上门喂养</button>
-      <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
-    </nav>
     <div class="header-right">
       <button id="logout-btn" class="btn btn-outline btn-sm">退出</button>
     </div>
@@ -320,6 +322,22 @@
 
     </div>
   </div>
+
+  <!-- 底部导航栏 -->
+  <nav class="bottom-nav">
+    <button class="tab-btn active" data-tab="boarding">
+      <span class="bottom-nav-icon">🏠</span>
+      <span class="bottom-nav-label">猫咪寄养</span>
+    </button>
+    <button class="tab-btn" data-tab="homevisit">
+      <span class="bottom-nav-icon">🚗</span>
+      <span class="bottom-nav-label">上门喂养</span>
+    </button>
+    <button class="tab-btn" data-tab="settings">
+      <span class="bottom-nav-icon">⚙️</span>
+      <span class="bottom-nav-label">设置</span>
+    </button>
+  </nav>
 
 </div><!-- end #app -->
 
