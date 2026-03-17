@@ -51,13 +51,13 @@ export function openOwnerDetail(ownerId) {
   const catsEl = document.getElementById('owner-detail-cats');
   catsEl.innerHTML = ownerCats.length === 0
     ? '<p style="color:#aaa;font-size:13px">尚无猫咪资料</p>'
-    : ownerCats.map(c => `
-        <div class="cat-card" onclick="window.openCatDetail('${c.id}')" style="cursor:pointer">
+    : `<div class="hscroll-strip">${ownerCats.map(c => `
+        <div class="cat-card hscroll-card" onclick="window.openCatDetail('${c.id}')" style="cursor:pointer">
           <div class="cat-card-name">${c.name} ${genderBadge(c.gender)}</div>
           <div class="cat-card-info">${[c.breed, c.age].filter(Boolean).join(' · ') || '品种未知'}</div>
           ${c.color ? `<div class="cat-card-info">${c.color}</div>` : ''}
           ${c.special_notes ? `<div class="cat-card-info" style="font-size:11px;color:#d04">${c.special_notes}</div>` : ''}
-        </div>`).join('');
+        </div>`).join('')}</div>`;
 
   // 寄养记录
   const ownerBoardings = state.boardings.filter(b => b.owner_id === ownerId);
@@ -65,7 +65,7 @@ export function openOwnerDetail(ownerId) {
   const sb = { active: '<span class="badge badge-active">进行中</span>', completed: '<span class="badge badge-completed">已完成</span>', cancelled: '<span class="badge badge-cancelled">已取消</span>' };
   boardEl.innerHTML = ownerBoardings.length === 0
     ? '<p style="color:#aaa;font-size:13px">暂无寄养记录</p>'
-    : `<table class="data-table" style="font-size:13px">
+    : `<div class="table-container"><table class="data-table" style="font-size:13px">
         <thead><tr><th>猫咪</th><th>入住</th><th>退房</th><th>房型</th><th>总价</th><th>状态</th></tr></thead>
         <tbody>${ownerBoardings.map(b => `<tr>
           <td><span class="link-text" onclick="hideModal('owner-detail-modal');window.openCatDetail('${b.cat_id}')">${b.cat?.name || '-'}</span></td>
@@ -74,7 +74,7 @@ export function openOwnerDetail(ownerId) {
           <td>${formatCurrency(b.total_price)}</td>
           <td>${sb[b.status] || b.status}</td>
         </tr>`).join('')}</tbody>
-      </table>`;
+      </table></div>`;
 
   showModal('owner-detail-modal');
 }

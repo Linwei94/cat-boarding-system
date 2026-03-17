@@ -31,7 +31,7 @@ export function openCatDetail(catId) {
   const sb = { active: '<span class="badge badge-active">进行中</span>', completed: '<span class="badge badge-completed">已完成</span>', cancelled: '<span class="badge badge-cancelled">已取消</span>' };
   boardEl.innerHTML = catBoardings.length === 0
     ? '<p style="color:#aaa;font-size:13px">暂无寄养记录</p>'
-    : `<table class="data-table" style="font-size:13px">
+    : `<div class="table-container"><table class="data-table" style="font-size:13px">
         <thead><tr><th>入住</th><th>退房</th><th>天数</th><th>房型</th><th>日费</th><th>总价</th><th>状态</th></tr></thead>
         <tbody>${catBoardings.map(b => `<tr>
           <td>${b.check_in_date}</td><td>${b.check_out_date}</td>
@@ -41,7 +41,7 @@ export function openCatDetail(catId) {
           <td><strong>${formatCurrency(b.total_price)}</strong></td>
           <td>${sb[b.status] || b.status}</td>
         </tr>`).join('')}</tbody>
-      </table>`;
+      </table></div>`;
 
   showModal('cat-detail-modal');
 }

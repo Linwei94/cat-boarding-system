@@ -374,6 +374,23 @@ body {
   gap: 12px;
 }
 
+/* 横向滑动卡片条（modal 内旗下猫咪等） */
+.hscroll-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  /* 隐藏滚动条但保留功能 */
+  scrollbar-width: none;
+}
+.hscroll-strip::-webkit-scrollbar { display: none; }
+.hscroll-card {
+  flex: 0 0 150px;
+  min-width: 150px;
+}
+
 .cat-card {
   background: rgba(255, 235, 230, 0.68);
   backdrop-filter: blur(12px) saturate(150%);
