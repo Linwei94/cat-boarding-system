@@ -57,8 +57,19 @@ initCatForm();
 initRoomTypeForm();
 initHomeVisitForm();
 
-async function refresh() {
+async function loadInitial() {
   showLoading(true);
+  try {
+    await loadAllData();
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    showToast('数据加载失败，请重试', 'error');
+  }
+  showLoading(false);
+}
+
+async function refresh() {
   try {
     await loadAllData();
     renderAll();
@@ -67,11 +78,10 @@ async function refresh() {
     console.error(err);
     showToast('刷新失败，请重试', 'error');
   }
-  showLoading(false);
 }
 
 initAuth(async () => {
-  await refresh().catch(() => {});
+  await loadInitial();
   initPullToRefresh(refresh);
   initSheetDismiss();
 });

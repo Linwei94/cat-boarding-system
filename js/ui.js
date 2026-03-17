@@ -105,53 +105,90 @@ export function initPullToRefresh(onRefresh) {
   const el = document.getElementById('app');
   if (!el) return;
 
-  let startY = 0;
-  let pulling = false;
-  let indicator = null;
+  const THRESHOLD = 80;
+  let startY = 0, pulling = false, refreshing = false;
 
-  function getIndicator() {
-    if (!indicator) {
-      indicator = document.createElement('div');
-      indicator.id = 'ptr-indicator';
-      indicator.innerHTML = '<div class="ptr-spinner"></div>';
-      document.body.appendChild(indicator);
-    }
-    return indicator;
-  }
+  // Build indicator
+  const ind = document.createElement('div');
+  ind.id = 'ptr-indicator';
+  ind.innerHTML = `
+    <div class="ptr-track">
+      <div class="ptr-bubble"><span class="ptr-cat">🐱</span><span class="ptr-arrow">↓</span></div>
+      <div class="ptr-label">下拉刷新</div>
+    </div>`;
+  document.body.appendChild(ind);
+
+  const bubble = ind.querySelector('.ptr-bubble');
+  const arrow  = ind.querySelector('.ptr-arrow');
+  const label  = ind.querySelector('.ptr-label');
 
   el.addEventListener('touchstart', e => {
-    if (el.scrollTop === 0 && !document.querySelector('.modal:not(.hidden)')) {
-      startY = e.touches[0].clientY;
-      pulling = true;
-    }
+    if (refreshing || el.scrollTop > 0 || document.querySelector('.modal:not(.hidden)')) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+    ind.style.transition = '';
   }, { passive: true });
 
   el.addEventListener('touchmove', e => {
     if (!pulling) return;
-    const dy = e.touches[0].clientY - startY;
-    if (dy > 0) {
-      const progress = Math.min(dy / 80, 1);
-      const ind = getIndicator();
-      ind.style.opacity = progress;
-      ind.style.transform = `translateX(-50%) translateY(${Math.min(dy * 0.4, 32)}px)`;
-      ind.classList.toggle('ptr-ready', progress >= 1);
+    const dy = Math.max(0, e.touches[0].clientY - startY);
+    if (dy === 0) return;
+    const pull = dy < THRESHOLD ? dy : THRESHOLD + (dy - THRESHOLD) * 0.25;
+    const progress = Math.min(pull / THRESHOLD, 1);
+
+    ind.style.opacity = Math.min(progress * 2, 1);
+    ind.style.transform = `translateX(-50%) translateY(${-56 + pull * 0.75}px)`;
+
+    const scale = 0.5 + progress * 0.6;
+    bubble.style.transform = `scale(${scale}) rotate(${progress * 20}deg)`;
+    arrow.style.transform = `rotate(${progress * 180}deg)`;
+    arrow.style.opacity = progress > 0.3 ? 1 : 0;
+
+    if (progress >= 1) {
+      label.textContent = '松手刷新 ✨';
+      ind.classList.add('ptr-ready');
+    } else {
+      label.textContent = '下拉刷新';
+      ind.classList.remove('ptr-ready');
     }
   }, { passive: true });
 
   el.addEventListener('touchend', async e => {
     if (!pulling) return;
     pulling = false;
-    const dy = e.changedTouches[0].clientY - startY;
-    const ind = getIndicator();
-    if (dy >= 80) {
+    const dy = Math.max(0, e.changedTouches[0].clientY - startY);
+
+    if (dy >= THRESHOLD) {
+      refreshing = true;
       ind.classList.add('ptr-loading');
-      ind.style.opacity = 1;
+      ind.classList.remove('ptr-ready');
+      // Spring into position
+      ind.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
       ind.style.transform = 'translateX(-50%) translateY(20px)';
+      ind.style.opacity = '1';
+      bubble.style.transform = 'scale(1) rotate(0deg)';
+      label.textContent = '刷新中…';
+      arrow.style.opacity = '0';
+
       try { await onRefresh(); } catch (_) {}
+
+      // Bounce out on complete
+      ind.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s 0.15s';
+      ind.style.transform = 'translateX(-50%) translateY(-60px) scale(1.3)';
+      ind.style.opacity = '0';
+      setTimeout(() => {
+        ind.style.transition = '';
+        ind.classList.remove('ptr-loading');
+        bubble.style.transform = '';
+        refreshing = false;
+      }, 600);
+    } else {
+      ind.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s';
+      ind.style.opacity = '0';
+      ind.style.transform = 'translateX(-50%) translateY(-56px)';
+      bubble.style.transform = '';
+      setTimeout(() => { ind.style.transition = ''; ind.classList.remove('ptr-ready'); }, 400);
     }
-    ind.style.opacity = 0;
-    ind.style.transform = 'translateX(-50%) translateY(-40px)';
-    ind.classList.remove('ptr-ready', 'ptr-loading');
   });
 }
 

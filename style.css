@@ -1154,49 +1154,82 @@ body {
    ================================================================ */
 #ptr-indicator {
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 8px);
+  top: calc(env(safe-area-inset-top) + 4px);
   left: 50%;
-  transform: translateX(-50%) translateY(-40px);
+  transform: translateX(-50%) translateY(-56px);
   z-index: 500;
   opacity: 0;
-  transition: opacity 0.15s, transform 0.15s;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.ptr-spinner {
-  width: 36px;
-  height: 36px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.ptr-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ptr-bubble {
+  width: 52px;
+  height: 52px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 50%;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(255,107,107,0.25), 0 2px 8px rgba(0,0,0,0.10);
+  border: 1px solid rgba(255,255,255,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  position: relative;
+  transform-origin: center;
+  transition: transform 0.1s;
 }
 
-.ptr-spinner::after {
-  content: '↓';
+.ptr-cat {
+  font-size: 26px;
+  line-height: 1;
+  position: absolute;
+}
+
+.ptr-arrow {
+  font-size: 14px;
+  font-weight: 800;
   color: var(--primary);
+  position: absolute;
+  bottom: 4px;
+  right: 2px;
+  opacity: 0;
+  transition: transform 0.2s, opacity 0.15s;
+}
+
+.ptr-label {
+  font-size: 11px;
   font-weight: 700;
-  transition: transform 0.2s;
+  color: var(--text-light);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-#ptr-indicator.ptr-ready .ptr-spinner::after {
-  transform: rotate(180deg);
+#ptr-indicator.ptr-ready .ptr-bubble {
+  box-shadow: 0 6px 24px rgba(255,107,107,0.40), 0 2px 8px rgba(0,0,0,0.12);
+  background: rgba(255,235,232,0.95);
 }
 
-#ptr-indicator.ptr-loading .ptr-spinner::after {
-  content: '';
-  width: 18px;
-  height: 18px;
-  border: 2.5px solid var(--primary-light);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  display: block;
+#ptr-indicator.ptr-ready .ptr-label {
+  color: var(--primary);
+}
+
+#ptr-indicator.ptr-loading .ptr-cat {
+  animation: ptr-spin 0.6s linear infinite;
+}
+
+@keyframes ptr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* ================================================================
