@@ -61,8 +61,7 @@ export function initSheetDismiss() {
         const resistance = dy > 60 ? 60 + (dy - 60) * 0.3 : dy;
         content.style.transition = 'none';
         content.style.transform = `translateY(${resistance}px)`;
-        const overlay = modal.querySelector('.modal-overlay');
-        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 300);
+        // Keep overlay fully opaque during drag — fading reveals white app background
       }
     }, { passive: true });
 
@@ -77,9 +76,6 @@ export function initSheetDismiss() {
         // Spring back
         content.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
         content.style.transform = '';
-        const overlay = modal.querySelector('.modal-overlay');
-        if (overlay) overlay.style.transition = 'opacity 0.3s';
-        if (overlay) overlay.style.opacity = '';
       }
     }, { passive: true });
   });
