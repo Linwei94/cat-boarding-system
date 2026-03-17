@@ -1061,12 +1061,6 @@ body {
   vertical-align: middle;
   line-height: 1;
 }
-.gender-sym {
-  font-size: 12px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
 .gender-badge.male    { background: rgba(0,122,255,0.10); color: #007AFF; }
 .gender-badge.female  { background: rgba(255,45,85,0.10); color: #FF2D55; }
 .gender-badge.unknown { background: rgba(142,142,147,0.12); color: var(--text-light); }

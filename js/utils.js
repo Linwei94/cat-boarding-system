@@ -21,8 +21,8 @@ export function roomBadge(name) {
 }
 
 export function genderBadge(gender) {
-  if (gender === 'male')   return '<span class="gender-badge male"><span class="gender-sym">♂</span>公</span>';
-  if (gender === 'female') return '<span class="gender-badge female"><span class="gender-sym">♀</span>母</span>';
+  if (gender === 'male')   return '<span class="gender-badge male">弟弟</span>';
+  if (gender === 'female') return '<span class="gender-badge female">妹妹</span>';
   return '';
 }
 
