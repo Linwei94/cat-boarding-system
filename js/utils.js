@@ -21,9 +21,9 @@ export function roomBadge(name) {
 }
 
 export function genderBadge(gender) {
-  if (gender === 'male')   return '<span class="gender-badge male">♂ 公</span>';
-  if (gender === 'female') return '<span class="gender-badge female">♀ 母</span>';
-  return '<span class="gender-badge unknown">— 未知</span>';
+  if (gender === 'male')   return '<span class="gender-badge male"><span class="gender-sym">♂</span>公</span>';
+  if (gender === 'female') return '<span class="gender-badge female"><span class="gender-sym">♀</span>母</span>';
+  return '';
 }
 
 export function daysBetween(startStr, endStr) {

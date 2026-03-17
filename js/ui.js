@@ -15,7 +15,6 @@ export function hideModal(id) {
   const modal = document.getElementById(id);
   const content = modal.querySelector('.modal-content');
   if (content) {
-    // Animate out before hiding
     content.style.transition = 'transform 0.28s cubic-bezier(0.4,0,1,1), opacity 0.2s';
     content.style.transform = 'translateY(110%)';
     content.style.opacity = '0';
@@ -24,12 +23,15 @@ export function hideModal(id) {
       content.style.transition = '';
       content.style.transform = '';
       content.style.opacity = '';
+      // Restore scroll AFTER modal is fully hidden
+      const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
+      if (!anyOpen) document.getElementById('app').style.overflow = '';
     }, 280);
   } else {
     modal.classList.add('hidden');
+    const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
+    if (!anyOpen) document.getElementById('app').style.overflow = '';
   }
-  const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
-  if (!anyOpen) document.getElementById('app').style.overflow = '';
 }
 
 // iOS-style swipe-down-to-dismiss for modal sheets
