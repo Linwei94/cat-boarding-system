@@ -62,7 +62,7 @@ export function initSheetDismiss() {
         content.style.transition = 'none';
         content.style.transform = `translateY(${resistance}px)`;
         const overlay = modal.querySelector('.modal-overlay');
-        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 120);
+        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 300);
       }
     }, { passive: true });
 

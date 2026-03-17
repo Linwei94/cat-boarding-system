@@ -151,7 +151,7 @@ body {
   top: 0;
   z-index: 100;
   box-shadow: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.06);
-  height: calc(72px + env(safe-area-inset-top));
+  height: calc(96px + env(safe-area-inset-top));
 }
 
 /* 移动端居中标题 */
@@ -313,7 +313,7 @@ body {
   background: none;
   cursor: pointer;
   font-family: inherit;
-  padding: 9px 12px;
+  padding: 11px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -335,7 +335,7 @@ body {
 }
 
 .bottom-nav-icon {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -345,7 +345,7 @@ body {
 }
 
 .bottom-nav-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
@@ -822,7 +822,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.30);
+  background: rgba(0,0,0,0.50);
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   transition: opacity 0.3s;
@@ -867,8 +867,16 @@ body {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* iOS sheet drag handle */
+@keyframes modalSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* iOS sheet drag handle + slide-up entrance */
 @media (max-width: 768px) {
+  .modal-content {
+    animation: modalSlideUp 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  }
   .modal-content::before {
     content: '';
     display: block;
