@@ -788,6 +788,7 @@ body {
   background: rgba(0,0,0,0.30);
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
+  transition: opacity 0.3s;
 }
 
 .modal-content {
@@ -805,7 +806,8 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10);
-  animation: modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: modalIn 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 /* modal 内的表格：全宽逃出 padding，横向可滑 */

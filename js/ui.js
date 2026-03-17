@@ -1,13 +1,81 @@
 export function showModal(id) {
-  document.getElementById(id).classList.remove('hidden');
+  const modal = document.getElementById(id);
+  modal.classList.remove('hidden');
+  // Reset any leftover transform from previous dismiss gesture
+  const content = modal.querySelector('.modal-content');
+  if (content) {
+    content.style.transition = '';
+    content.style.transform = '';
+    content.style.opacity = '';
+  }
   document.getElementById('app').style.overflow = 'hidden';
 }
 
 export function hideModal(id) {
-  document.getElementById(id).classList.add('hidden');
-  // restore scroll only if no other modal is open
+  const modal = document.getElementById(id);
+  const content = modal.querySelector('.modal-content');
+  if (content) {
+    // Animate out before hiding
+    content.style.transition = 'transform 0.28s cubic-bezier(0.4,0,1,1), opacity 0.2s';
+    content.style.transform = 'translateY(110%)';
+    content.style.opacity = '0';
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      content.style.transition = '';
+      content.style.transform = '';
+      content.style.opacity = '';
+    }, 280);
+  } else {
+    modal.classList.add('hidden');
+  }
   const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
   if (!anyOpen) document.getElementById('app').style.overflow = '';
+}
+
+// iOS-style swipe-down-to-dismiss for modal sheets
+export function initSheetDismiss() {
+  document.querySelectorAll('.modal').forEach(modal => {
+    const content = modal.querySelector('.modal-content');
+    if (!content) return;
+
+    let startY = 0, startScrollTop = 0, dragging = false;
+
+    content.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      startScrollTop = content.scrollTop;
+      dragging = false;
+    }, { passive: true });
+
+    content.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - startY;
+      // Only dismiss-drag when at top of scroll AND pulling down
+      if (dy > 0 && content.scrollTop <= 0) {
+        dragging = true;
+        const resistance = dy > 60 ? 60 + (dy - 60) * 0.3 : dy;
+        content.style.transition = 'none';
+        content.style.transform = `translateY(${resistance}px)`;
+        const overlay = modal.querySelector('.modal-overlay');
+        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 300);
+      }
+    }, { passive: true });
+
+    content.addEventListener('touchend', e => {
+      if (!dragging) return;
+      dragging = false;
+      const dy = e.changedTouches[0].clientY - startY;
+      const threshold = window.innerHeight * 0.22;
+      if (dy > threshold) {
+        hideModal(modal.id);
+      } else {
+        // Spring back
+        content.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+        content.style.transform = '';
+        const overlay = modal.querySelector('.modal-overlay');
+        if (overlay) overlay.style.transition = 'opacity 0.3s';
+        if (overlay) overlay.style.opacity = '';
+      }
+    }, { passive: true });
+  });
 }
 
 export function showLoading(show) {

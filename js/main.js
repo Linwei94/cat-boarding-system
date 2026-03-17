@@ -3,7 +3,7 @@
 // ================================================================
 import { loadAllData } from './api.js';
 import { initAuth } from './auth.js';
-import { initTabs, initPullToRefresh, showLoading, showToast, hideModal } from './ui.js';
+import { initTabs, initPullToRefresh, initSheetDismiss, showLoading, showToast, hideModal } from './ui.js';
 import { renderAll, renderBoardingsTable } from './render.js';
 
 import { openAddBoarding, openEditBoarding, onBoardingOwnerChange,
@@ -73,4 +73,5 @@ async function refresh() {
 initAuth(async () => {
   await refresh().catch(() => {});
   initPullToRefresh(refresh);
+  initSheetDismiss();
 });
