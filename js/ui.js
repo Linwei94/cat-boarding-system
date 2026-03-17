@@ -14,19 +14,24 @@ export function showModal(id) {
 export function hideModal(id) {
   const modal = document.getElementById(id);
   const content = modal.querySelector('.modal-content');
+  const overlay = modal.querySelector('.modal-overlay');
   if (content) {
-    content.style.transition = 'transform 0.28s cubic-bezier(0.4,0,1,1), opacity 0.2s';
+    content.style.transition = 'transform 0.26s cubic-bezier(0.4,0,1,1), opacity 0.18s';
     content.style.transform = 'translateY(110%)';
     content.style.opacity = '0';
+    if (overlay) {
+      overlay.style.transition = 'opacity 0.22s ease';
+      overlay.style.opacity = '0';
+    }
     setTimeout(() => {
       modal.classList.add('hidden');
       content.style.transition = '';
       content.style.transform = '';
       content.style.opacity = '';
-      // Restore scroll AFTER modal is fully hidden
+      if (overlay) { overlay.style.transition = ''; overlay.style.opacity = ''; }
       const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
       if (!anyOpen) document.getElementById('app').style.overflow = '';
-    }, 280);
+    }, 260);
   } else {
     modal.classList.add('hidden');
     const anyOpen = document.querySelectorAll('.modal:not(.hidden)').length > 0;
@@ -57,7 +62,7 @@ export function initSheetDismiss() {
         content.style.transition = 'none';
         content.style.transform = `translateY(${resistance}px)`;
         const overlay = modal.querySelector('.modal-overlay');
-        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 300);
+        if (overlay) overlay.style.opacity = Math.max(0, 1 - resistance / 120);
       }
     }, { passive: true });
 
