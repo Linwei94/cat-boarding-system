@@ -20,7 +20,7 @@ import { openAddRoomType, openEditRoomType, deleteRoomType,
          initRoomTypeForm } from './roomtype.js';
 
 import { openAddHomeVisit, openEditHomeVisit, deleteHomeVisit,
-         onVisitOwnerChange, initHomeVisitForm } from './homevisit.js';
+         openHomeVisitDetail, onVisitOwnerChange, initHomeVisitForm } from './homevisit.js';
 
 import { loadDemoData, clearDemoData } from './demo.js';
 import { openTodayChart, openMonthChart, openYearChart } from './charts.js';
@@ -38,7 +38,7 @@ Object.assign(window, {
   // 房型
   openAddRoomType, openEditRoomType, deleteRoomType,
   // 上门喂养
-  openAddHomeVisit, openEditHomeVisit, deleteHomeVisit, onVisitOwnerChange,
+  openAddHomeVisit, openEditHomeVisit, deleteHomeVisit, openHomeVisitDetail, onVisitOwnerChange,
   // 弹窗
   hideModal,
   // 演示数据

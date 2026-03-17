@@ -57,6 +57,7 @@ export function openTodayChart() {
         }],
       },
       options: {
+        animation: false,
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -139,6 +140,7 @@ function renderChart(labels, boardingData, visitData) {
       ],
     },
     options: {
+      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {

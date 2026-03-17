@@ -81,6 +81,51 @@ export class MultiDatePicker {
   }
 }
 
+// ── 上门详情 ──────────────────────────────────────────────────────
+export function openHomeVisitDetail(visitId) {
+  const v = state.homeVisits.find(x => x.id === visitId);
+  if (!v) return;
+  const owner = state.owners.find(o => o.id === v.owner_id);
+  const cat   = v.cat_id ? state.cats.find(c => c.id === v.cat_id) : null;
+
+  document.getElementById('hv-detail-title').textContent = owner ? `${owner.name} 的上门喂养` : '上门喂养详情';
+  document.getElementById('hv-detail-edit-btn').onclick = () => { hideModal('homevisit-detail-modal'); openEditHomeVisit(visitId); };
+
+  // Map link — opens Apple Maps on iOS, Google Maps elsewhere
+  const mapUrl = `https://maps.apple.com/?q=${encodeURIComponent(v.address)}`;
+  const addressHtml = v.address
+    ? `<a href="${mapUrl}" target="_blank" class="link-text" style="display:inline-flex;align-items:center;gap:4px">📍 ${v.address}</a>`
+    : '-';
+
+  const statusMap = { active: '进行中', completed: '已完成', cancelled: '已取消' };
+  const infoItems = [
+    ['👤 主人',   owner ? `<span class="link-text" onclick="hideModal('homevisit-detail-modal');window.openOwnerDetail('${owner.id}')">${owner.name}</span>` : '-'],
+    ['📞 电话',   owner?.phone || '-'],
+    ['🐱 猫咪',   cat ? `<span class="link-text" onclick="hideModal('homevisit-detail-modal');window.openCatDetail('${cat.id}')">${cat.name}</span>` : '不指定'],
+    ['🕐 时间',   v.visit_time || '时间待定'],
+    ['💰 单次费用', `A$${parseFloat(v.price_per_visit || 0).toFixed(2)}`],
+    ['📌 状态',   statusMap[v.status] || v.status],
+    ['📍 地址',   addressHtml],
+    ['📝 备注',   v.notes || '无'],
+  ];
+  document.getElementById('hv-detail-info').innerHTML = infoItems.map(([label, val]) =>
+    `<div class="detail-info-item"><span class="detail-label">${label}</span><span class="detail-val">${val}</span></div>`
+  ).join('');
+
+  // Dates
+  const dates = state.homeVisitDates.filter(d => d.home_visit_id === visitId).map(d => d.visit_date).sort();
+  const today = new Date().toLocaleDateString('en-CA');
+  document.getElementById('hv-detail-dates').innerHTML = dates.length === 0
+    ? '<p style="color:#aaa;font-size:13px">暂无日期安排</p>'
+    : dates.map(d => {
+        const isPast   = d < today;
+        const isToday  = d === today;
+        return `<span class="date-chip" style="${isPast ? 'opacity:0.45' : ''}${isToday ? 'background:#FF6B6B' : ''}">${d}${isToday ? ' 今天' : ''}</span>`;
+      }).join('');
+
+  showModal('homevisit-detail-modal');
+}
+
 // ── 上门喂养 CRUD ─────────────────────────────────────────────────
 export function openAddHomeVisit() {
   document.getElementById('homevisit-modal-title').textContent = '新增上门喂养';

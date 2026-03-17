@@ -144,10 +144,10 @@ export function renderTodaysVisits() {
     const owner = state.owners.find(o => o.id === visit.owner_id);
     const cat   = visit.cat_id ? state.cats.find(c => c.id === visit.cat_id) : null;
     return `
-      <div class="visit-card">
+      <div class="visit-card" style="cursor:pointer" onclick="window.openHomeVisitDetail('${visit.id}')">
         <div class="visit-card-time">🕐 ${visit.visit_time || '时间待定'}</div>
-        <div class="visit-card-info link-text" onclick="window.openOwnerDetail('${visit.owner_id}')">👤 ${owner?.name || '未知主人'}</div>
-        ${cat ? `<div class="visit-card-info link-text" onclick="window.openCatDetail('${visit.cat_id}')">🐱 ${cat.name}</div>` : ''}
+        <div class="visit-card-info">👤 ${owner?.name || '未知主人'}</div>
+        ${cat ? `<div class="visit-card-info">🐱 ${cat.name}</div>` : ''}
         <div class="visit-card-info">📍 ${visit.address}</div>
         <div class="visit-card-info">💰 ${formatCurrency(visit.price_per_visit)} / 次</div>
       </div>`;
@@ -171,7 +171,7 @@ export function renderHomeVisitsTable() {
       <tr>
         <td><span class="link-text" onclick="window.openOwnerDetail('${v.owner_id}')">${v.owner?.name || '未知'}</span></td>
         <td>${v.cat ? `<span class="link-text" onclick="window.openCatDetail('${v.cat_id}')">${v.cat.name}</span>` : '-'}</td>
-        <td>${v.address}</td>
+        <td><span class="link-text" onclick="window.openHomeVisitDetail('${v.id}')">${v.address}</span></td>
         <td>${v.visit_time || '-'}</td>
         <td style="font-size:12px;max-width:200px">${dateDisplay}</td>
         <td>${formatCurrency(v.price_per_visit)}</td>

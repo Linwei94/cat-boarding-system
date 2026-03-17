@@ -113,13 +113,12 @@ export function initPullToRefresh(onRefresh) {
   ind.id = 'ptr-indicator';
   ind.innerHTML = `
     <div class="ptr-track">
-      <div class="ptr-bubble"><span class="ptr-cat">🐱</span><span class="ptr-arrow">↓</span></div>
+      <div class="ptr-bubble"><span class="ptr-cat">🐱</span></div>
       <div class="ptr-label">下拉刷新</div>
     </div>`;
   document.body.appendChild(ind);
 
   const bubble = ind.querySelector('.ptr-bubble');
-  const arrow  = ind.querySelector('.ptr-arrow');
   const label  = ind.querySelector('.ptr-label');
 
   el.addEventListener('touchstart', e => {
@@ -141,9 +140,6 @@ export function initPullToRefresh(onRefresh) {
 
     const scale = 0.5 + progress * 0.6;
     bubble.style.transform = `scale(${scale}) rotate(${progress * 20}deg)`;
-    arrow.style.transform = `rotate(${progress * 180}deg)`;
-    arrow.style.opacity = progress > 0.3 ? 1 : 0;
-
     if (progress >= 1) {
       label.textContent = '松手刷新 ✨';
       ind.classList.add('ptr-ready');
@@ -168,7 +164,6 @@ export function initPullToRefresh(onRefresh) {
       ind.style.opacity = '1';
       bubble.style.transform = 'scale(1) rotate(0deg)';
       label.textContent = '刷新中…';
-      arrow.style.opacity = '0';
 
       try { await onRefresh(); } catch (_) {}
 

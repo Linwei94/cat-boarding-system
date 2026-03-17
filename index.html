@@ -736,6 +736,27 @@
   </div>
 </div>
 
+<!-- 上门喂养详情弹窗 -->
+<div id="homevisit-detail-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('homevisit-detail-modal')"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 id="hv-detail-title">上门喂养详情</h3>
+      <button class="modal-close" onclick="hideModal('homevisit-detail-modal')">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <div id="hv-detail-info" class="detail-info-grid" style="margin-bottom:20px"></div>
+      <div class="section-header" style="margin-bottom:10px">
+        <h2 style="font-size:15px">📅 喂养日期</h2>
+      </div>
+      <div id="hv-detail-dates" style="margin-bottom:16px"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" id="hv-detail-edit-btn">编辑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast 通知 -->
 <div id="toast" class="toast"></div>
 
