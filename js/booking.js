@@ -3,6 +3,20 @@ import { showModal, hideModal, showToast } from './ui.js';
 
 let generatedLink = '';
 
+// 兼容 HTTP 和 HTTPS 的剪贴板写入
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;pointer-events:none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); ta.remove(); return Promise.resolve(); }
+  catch (e) { ta.remove(); return Promise.reject(e); }
+}
+
 export async function openGenerateLink() {
   const btn = document.querySelector('[onclick="openGenerateLink()"]');
   if (btn) { btn.disabled = true; btn.textContent = '生成中…'; }
@@ -24,11 +38,10 @@ export async function openGenerateLink() {
 
     // 直接复制到剪贴板
     try {
-      await navigator.clipboard.writeText(generatedLink);
+      await copyText(generatedLink);
       showToast('🔗 链接已复制，发给客户即可！', 'success');
     } catch {
-      // 降级：弹出链接让用户手动复制
-      prompt('复制此链接发给客户：', generatedLink);
+      showToast('请手动复制链接', 'error');
     }
 
     // 刷新列表
@@ -40,16 +53,10 @@ export async function openGenerateLink() {
 
 export function copyBookingLink() {
   if (!generatedLink) return;
-  navigator.clipboard.writeText(generatedLink).then(() => {
-    showToast('链接已复制到剪贴板 ✓', 'success');
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = generatedLink;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
+  copyText(generatedLink).then(() => {
     showToast('链接已复制 ✓', 'success');
+  }).catch(() => {
+    showToast('复制失败，请手动复制', 'error');
   });
 }
 
@@ -118,7 +125,7 @@ export async function loadBookingRequests() {
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
               ${statusBadge[req.status] || req.status}
-              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
+              <button class="btn btn-xs btn-danger" onclick="deleteBookingToken('${t.id}')">删除</button>
             </div>
           </div>
         </div>`;
@@ -133,7 +140,7 @@ export async function loadBookingRequests() {
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <span style="font-size:12px;color:#aaa">已过期</span>
-              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
+              <button class="btn btn-xs btn-danger" onclick="deleteBookingToken('${t.id}')">删除</button>
             </div>
           </div>
         </div>`;
@@ -150,7 +157,7 @@ export async function loadBookingRequests() {
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               <button class="btn btn-xs btn-secondary" onclick="recopyLink('${t.token}')">复制</button>
-              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
+              <button class="btn btn-xs btn-danger" onclick="deleteBookingToken('${t.id}')">删除</button>
             </div>
           </div>
         </div>`;
@@ -161,7 +168,6 @@ export async function loadBookingRequests() {
 }
 
 export async function deleteBookingToken(id) {
-  if (!confirm('确认删除这条预约链接？')) return;
   const { error } = await db.from('booking_tokens').delete().eq('id', id);
   if (error) { showToast('删除失败：' + error.message, 'error'); return; }
   showToast('已删除 ✓', 'success');
@@ -171,10 +177,10 @@ export async function deleteBookingToken(id) {
 export function recopyLink(token) {
   const base = window.location.origin + window.location.pathname.replace('index.html', '');
   const url = `${base}booking.html?token=${token}`;
-  navigator.clipboard.writeText(url).then(() => {
+  copyText(url).then(() => {
     showToast('链接已复制 ✓', 'success');
   }).catch(() => {
-    prompt('复制此链接发给客户：', url);
+    showToast('复制失败，请手动复制', 'error');
   });
 }
 
