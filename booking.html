@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>预约寄养 — 阿里嘎多猫咪寄养</title>
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --primary-light: #FF8E64;
+      --bg: #FFF8F5;
+      --surface: #FFFFFF;
+      --border: rgba(255,107,107,0.15);
+      --text: #2D1B14;
+      --text-secondary: #8B6B63;
+      --success: #34C759;
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── 进度条 ────────────────────────────────────── */
+    #progress-bar-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,107,107,0.12);
+      z-index: 100;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ── 步骤指示 ─────────────────────────────────── */
+    #step-indicator {
+      position: fixed;
+      top: 12px; right: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      z-index: 100;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── 卡片容器 ─────────────────────────────────── */
+    #wizard {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .step-screen {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: max(env(safe-area-inset-top), 20px) 20px max(env(safe-area-inset-bottom), 24px);
+      animation: stepIn 0.38s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step-screen.active { display: flex; }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 欢迎页 ───────────────────────────────────── */
+    #screen-welcome {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+    }
+    .welcome-logo { font-size: 72px; line-height: 1; }
+    .welcome-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .welcome-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.6; max-width: 300px; }
+    .privacy-badge {
+      background: rgba(52,199,89,0.1);
+      border: 1px solid rgba(52,199,89,0.25);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #22863a;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── 须知卡片 ─────────────────────────────────── */
+    .notice-screen {
+      gap: 20px;
+      padding-top: max(env(safe-area-inset-top), 32px);
+    }
+    .notice-icon { font-size: 48px; text-align: center; }
+    .notice-title { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+    .notice-points {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .notice-point {
+      display: flex;
+      gap: 12px;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(255,107,107,0.06);
+      font-size: 14px;
+      line-height: 1.65;
+      color: #3D2A22;
+    }
+    .notice-point-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    /* ── 表单页 ───────────────────────────────────── */
+    .form-screen { gap: 20px; }
+    .form-section-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .form-section-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.3px;
+    }
+    .form-label .req { color: var(--primary); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255,107,107,0.12);
+    }
+    .form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23FF6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── 文件上传 ─────────────────────────────────── */
+    .upload-box {
+      border: 2px dashed rgba(255,107,107,0.3);
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255,107,107,0.03);
+    }
+    .upload-box:hover, .upload-box.has-file {
+      border-color: var(--primary);
+      background: rgba(255,107,107,0.06);
+    }
+    .upload-box input[type=file] { display: none; }
+    .upload-icon { font-size: 36px; margin-bottom: 8px; }
+    .upload-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+    .upload-hint { font-size: 12px; color: #bbb; margin-top: 4px; }
+    .upload-preview { max-width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-top: 10px; }
+
+    /* ── 签名区 ───────────────────────────────────── */
+    .sig-wrap {
+      border: 2px solid rgba(255,107,107,0.25);
+      border-radius: 16px;
+      overflow: hidden;
+      background: white;
+      position: relative;
+    }
+    #sig-canvas {
+      display: block;
+      width: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    .sig-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(0,0,0,0.18);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .sig-clear-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,107,107,0.12);
+      border: none;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* ── 按钮 ─────────────────────────────────────── */
+    .btn-primary {
+      width: 100%;
+      padding: 17px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 20px rgba(255,107,107,0.35);
+      transition: transform 0.12s, box-shadow 0.12s;
+      -webkit-appearance: none;
+      font-family: inherit;
+    }
+    .btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(255,107,107,0.2); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      width: 100%;
+      padding: 15px;
+      background: var(--surface);
+      color: var(--primary);
+      border: 1.5px solid rgba(255,107,107,0.3);
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-secondary:active { background: rgba(255,107,107,0.06); }
+
+    .btn-area {
+      margin-top: auto;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── 须知确认checkbox ─────────────────────────── */
+    .confirm-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(52,199,89,0.06);
+      border: 1.5px solid rgba(52,199,89,0.2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+    .confirm-check input[type=checkbox] { display: none; }
+    .check-box {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(52,199,89,0.4);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      margin-top: 1px;
+    }
+    .check-box.checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .check-box.checked::after { content: '✓'; color: white; font-size: 13px; font-weight: 700; }
+    .confirm-text { font-size: 13px; line-height: 1.6; color: #3D5A3E; font-weight: 500; }
+
+    /* ── 成功页 ───────────────────────────────────── */
+    #screen-success {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+    .success-icon { font-size: 80px; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .success-title { font-size: 24px; font-weight: 800; }
+    .success-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 300px; }
+
+    /* ── Honeypot (hidden from users) ────────────────── */
+    .hp-field { position: absolute; left: -9999px; opacity: 0; pointer-events: none; tabindex: -1; }
+
+    /* ── 错误提示 ──────────────────────────────────── */
+    .field-error { font-size: 12px; color: #ff4444; margin-top: 4px; font-weight: 500; }
+
+    @media (min-width: 600px) {
+      .step-screen { max-width: 480px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+      #progress-bar-wrap { max-width: 480px; left: 50%; transform: translateX(-50%); border-radius: 0 0 4px 4px; }
+      #step-indicator { right: calc(50% - 460px); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+<div id="step-indicator"></div>
+
+<div id="wizard">
+
+  <!-- 无效/过期 token 页 -->
+  <div class="step-screen active" id="screen-invalid" style="justify-content:center;align-items:center;text-align:center;gap:20px">
+    <div style="font-size:64px">🔒</div>
+    <div style="font-size:20px;font-weight:800">链接无效或已过期</div>
+    <div style="font-size:14px;color:var(--text-secondary);line-height:1.7;max-width:280px">
+      此预约链接已失效，请联系寄养管家获取新的预约链接。
+    </div>
+  </div>
+
+  <!-- ① 欢迎页 -->
+  <div class="step-screen" id="screen-welcome">
+    <div class="welcome-logo">🐱</div>
+    <div>
+      <div class="welcome-title">阿里嘎多猫咪寄养</div>
+      <div style="font-size:14px;color:var(--text-secondary);margin-top:6px">寄养预约申请表</div>
+    </div>
+    <div class="welcome-sub">
+      感谢您选择我们！填写此表单约需 5 分钟，<br>完成后我们会尽快与您确认预约。
+    </div>
+    <div class="privacy-badge">🔒 您的信息仅用于本次预约，绝不外传</div>
+    <div class="btn-area" style="width:100%">
+      <button class="btn-primary" onclick="nextStep()">开始填写 →</button>
+    </div>
+  </div>
+
+  <!-- ② 须知页（动态生成） -->
+  <div id="notice-screens"></div>
+
+  <!-- ③ 主人信息 -->
+  <div class="step-screen form-screen" id="screen-owner">
+    <div>
+      <div class="form-section-title">👤 主人信息</div>
+      <div class="form-section-sub">请填写您的联系方式，便于我们与您沟通</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">姓名 <span class="req">*</span></label>
+      <input class="form-input" id="f-name" placeholder="您的姓名" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">手机号码 <span class="req">*</span></label>
+      <input class="form-input" id="f-phone" type="tel" placeholder="+61 4XX XXX XXX" autocomplete="tel">
+    </div>
+    <div class="form-group">
+      <label class="form-label">微信号</label>
+      <input class="form-input" id="f-wechat" placeholder="微信号（选填）">
+    </div>
+    <div class="form-group">
+      <label class="form-label">电子邮箱</label>
+      <input class="form-input" id="f-email" type="email" placeholder="邮箱（选填）" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">您的家庭住址</label>
+      <input class="form-input" id="f-address" placeholder="地址（选填）" autocomplete="street-address">
+    </div>
+    <!-- Honeypot -->
+    <div class="hp-field" aria-hidden="true">
+      <input type="text" id="hp-name" name="website" tabindex="-1" autocomplete="off">
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="submitOwnerStep()">下一步 →</button>
+      <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ④ 猫咪信息 -->
+  <div class="step-screen form-screen" id="screen-cat">
+    <div>
+      <div class="form-section-title">🐱 猫咪信息</div>
+      <div class="form-section-sub">请告诉我们您的猫咪的基本情况</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">猫咪名字 <span class="req">*</span></label>
+      <input class="form-input" id="f-cat-name" placeholder="猫咪的名字">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">性别</label>
+        <select class="form-select" id="f-cat-gender">
+          <option value="">请选择</option>
+          <option value="male">弟弟（公猫）</option>
+          <option value="female">妹妹（母猫）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">是否绝育</label>
+        <select class="form-select" id="f-cat-neutered">
+          <option value="">请选择</option>
+          <option value="yes">是</option>
+          <option value="no">否</option>
+          <option value="unknown">不确定</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">品种</label>
+        <input class="form-input" id="f-cat-breed" placeholder="如：英短、橘猫">
+      </div>
+      <div class="form-group">
+        <label class="form-label">年龄</label>
+        <input class="form-input" id="f-cat-age" placeholder="如：2岁">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">特殊需求 / 饮食习惯</label>
+      <textarea class="form-textarea" id="f-cat-notes" placeholder="如：每天需喂药、只吃湿粮、怕陌生人等..."></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="submitCatStep()">下一步 →</button>
+      <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ⑤ 寄养日期 -->
+  <div class="step-screen form-screen" id="screen-dates">
+    <div>
+      <div class="form-section-title">📅 寄养日期</div>
+      <div class="form-section-sub">请选择入住和离开日期</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">入住日期 <span class="req">*</span></label>
+      <input class="form-input" id="f-checkin" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">退房日期 <span class="req">*</span></label>
+      <input class="form-input" id="f-checkout" type="date">
+    </div>
+    <div id="date-calc" style="background:rgba(255,107,107,0.06);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--text-secondary);display:none">
+      🐾 预计寄养 <strong id="date-days" style="color:var(--primary)"></strong> 天
+    </div>
+    <div class="form-group">
+      <label class="form-label">预计接送方式</label>
+      <select class="form-select" id="f-transport">
+        <option value="">请选择</option>
+        <option value="self">自行送达 / 自行接回</option>
+        <option value="need-pickup">需要上门接送（另行沟通费用）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">其他备注</label>
+      <textarea class="form-textarea" id="f-booking-notes" placeholder="如：特定入住时间要求、其他想告诉我们的..."></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="submitDatesStep()">下一步 →</button>
+      <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ⑥ 资料上传 -->
+  <div class="step-screen form-screen" id="screen-docs">
+    <div>
+      <div class="form-section-title">📎 上传资料</div>
+      <div class="form-section-sub">请上传以下资料以完成预约（仅用于身份核验，绝对保密）</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">护照或身份证照片 <span class="req">*</span></label>
+      <div class="upload-box" id="passport-box" onclick="document.getElementById('f-passport').click()">
+        <input type="file" id="f-passport" accept="image/*,.pdf" onchange="handleUpload(this,'passport-box','passport-preview')">
+        <div class="upload-icon">🪪</div>
+        <div class="upload-label">点击上传</div>
+        <div class="upload-hint">支持 JPG / PNG / PDF，最大 10MB</div>
+        <img id="passport-preview" class="upload-preview" style="display:none">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">猫咪疫苗接种证明 <span class="req">*</span></label>
+      <div class="upload-box" id="vaccine-box" onclick="document.getElementById('f-vaccine').click()">
+        <input type="file" id="f-vaccine" accept="image/*,.pdf" onchange="handleUpload(this,'vaccine-box','vaccine-preview')">
+        <div class="upload-icon">💉</div>
+        <div class="upload-label">点击上传</div>
+        <div class="upload-hint">支持 JPG / PNG / PDF，最大 10MB</div>
+        <img id="vaccine-preview" class="upload-preview" style="display:none">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">猫咪近照（选填）</label>
+      <div class="upload-box" id="catphoto-box" onclick="document.getElementById('f-catphoto').click()">
+        <input type="file" id="f-catphoto" accept="image/*" onchange="handleUpload(this,'catphoto-box','catphoto-preview')">
+        <div class="upload-icon">📷</div>
+        <div class="upload-label">点击上传</div>
+        <div class="upload-hint">让我们提前认识您的猫咪 🐾</div>
+        <img id="catphoto-preview" class="upload-preview" style="display:none">
+      </div>
+    </div>
+
+    <div class="btn-area">
+      <button class="btn-primary" onclick="submitDocsStep()">下一步 →</button>
+      <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ⑦ 签名 -->
+  <div class="step-screen form-screen" id="screen-sign">
+    <div>
+      <div class="form-section-title">✍️ 电子签名</div>
+      <div class="form-section-sub">请在下方空白处手写签名，确认您已阅读并同意所有须知条款</div>
+    </div>
+    <div class="sig-wrap">
+      <canvas id="sig-canvas" height="200"></canvas>
+      <div class="sig-placeholder" id="sig-placeholder">在此处手写签名</div>
+      <button class="sig-clear-btn" onclick="clearSignature()">清除</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.6">
+      签名即代表您确认以上所有填写内容真实有效，<br>并同意遵守所有寄养须知条款。
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" id="submit-btn" onclick="submitForm()">提交预约申请</button>
+      <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ⑧ 成功页 -->
+  <div class="step-screen" id="screen-success">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">预约申请已提交！</div>
+    <div class="success-sub">
+      感谢您的信任 🐾<br><br>
+      我们会在 24 小时内通过电话或微信与您确认预约详情，请保持联系方式畅通。
+    </div>
+    <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.2);border-radius:16px;padding:20px;width:100%;max-width:320px">
+      <div style="font-size:13px;font-weight:700;color:#2D6A35;margin-bottom:8px">📋 提交摘要</div>
+      <div id="success-summary" style="font-size:13px;color:#3D5A3E;line-height:1.8"></div>
+    </div>
+  </div>
+
+</div><!-- #wizard -->
+
+<script type="module">
+  import { NOTICES, BUSINESS_INFO } from './booking-notices.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './js/config.js';
+
+  // ── Supabase 客户端（公开 anon key，客户端可用） ──
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ── Token 验证 ───────────────────────────────────
+  let bookingTokenId = null;
+  async function validateToken() {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (!token) return showInvalid();
+
+    const { data, error } = await sb
+      .from('booking_tokens')
+      .select('id, used, expires_at, customer_name')
+      .eq('token', token)
+      .single();
+
+    if (error || !data) return showInvalid();
+    if (data.used) return showInvalid('此链接已被使用，每个链接只能提交一次。');
+    if (new Date(data.expires_at) < new Date()) return showInvalid('此链接已过期，请联系寄养管家获取新链接。');
+
+    bookingTokenId = data.id;
+    // 如果管理员备注了客户姓名，预填
+    if (data.customer_name) {
+      document.getElementById('f-name').value = data.customer_name;
+    }
+    // 显示欢迎页
+    document.getElementById('screen-invalid').classList.remove('active');
+    document.getElementById('screen-welcome').classList.add('active');
+    currentStep = 1; // skip invalid screen
+  }
+
+  function showInvalid(msg) {
+    if (msg) {
+      document.querySelector('#screen-invalid div:nth-child(3)').textContent = msg;
+    }
+    // already showing invalid screen by default
+  }
+
+  // ── 防刷保护（简单速率限制） ──────────────────────
+  const RATE_KEY = 'booking_submissions';
+  const RATE_LIMIT = 3;    // 每个浏览器最多提交次数
+  const RATE_WINDOW = 24 * 60 * 60 * 1000; // 24小时
+
+  function checkRateLimit() {
+    const now = Date.now();
+    const raw = localStorage.getItem(RATE_KEY);
+    let data = raw ? JSON.parse(raw) : { count: 0, windowStart: now };
+    if (now - data.windowStart > RATE_WINDOW) {
+      data = { count: 0, windowStart: now };
+    }
+    if (data.count >= RATE_LIMIT) return false;
+    data.count++;
+    localStorage.setItem(RATE_KEY, JSON.stringify(data));
+    return true;
+  }
+
+  // ── 步骤管理 ────────────────────────────────────
+  const FORM_DATA = {};
+  let currentStep = 0;
+  let totalSteps = 0;
+
+  // 动态生成须知步骤
+  const noticeContainer = document.getElementById('notice-screens');
+  NOTICES.forEach((n, i) => {
+    const div = document.createElement('div');
+    div.className = 'step-screen notice-screen';
+    div.id = `screen-notice-${i}`;
+    div.innerHTML = `
+      <div class="notice-icon">${n.icon}</div>
+      <div class="notice-title">${n.title}</div>
+      <div class="notice-points">
+        ${n.points.map((p, j) => `
+          <div class="notice-point">
+            <div class="notice-point-num">${j + 1}</div>
+            <div>${p}</div>
+          </div>`).join('')}
+      </div>
+      <div class="btn-area">
+        <label class="confirm-check" onclick="toggleCheck(this)">
+          <input type="checkbox" id="check-notice-${i}">
+          <div class="check-box"></div>
+          <div class="confirm-text">${n.confirmText}</div>
+        </label>
+        <button class="btn-primary" id="notice-btn-${i}" disabled onclick="nextStep()">确认并继续 →</button>
+        <button class="btn-secondary" onclick="prevStep()">← 返回</button>
+      </div>`;
+    noticeContainer.appendChild(div);
+  });
+
+  // 所有步骤顺序
+  const STEP_IDS = [
+    'screen-invalid',
+    'screen-welcome',
+    ...NOTICES.map((_, i) => `screen-notice-${i}`),
+    'screen-owner',
+    'screen-cat',
+    'screen-dates',
+    'screen-docs',
+    'screen-sign',
+    'screen-success',
+  ];
+  totalSteps = STEP_IDS.length;
+
+  // 步骤标签（不含无效、欢迎、成功页）
+  const STEP_LABELS = [
+    null,
+    null,
+    ...NOTICES.map((n, i) => `须知 ${i + 1}/${NOTICES.length}`),
+    '主人信息', '猫咪信息', '寄养日期', '上传资料', '签名确认',
+    null,
+  ];
+
+  function updateUI() {
+    const pct = currentStep / (totalSteps - 2) * 100;
+    document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+    const label = STEP_LABELS[currentStep];
+    document.getElementById('step-indicator').textContent = label
+      ? `${currentStep} / ${totalSteps - 2}`
+      : '';
+  }
+
+  window.nextStep = function() {
+    if (currentStep >= totalSteps - 1) return;
+    document.getElementById(STEP_IDS[currentStep]).classList.remove('active');
+    currentStep++;
+    const next = document.getElementById(STEP_IDS[currentStep]);
+    next.classList.add('active');
+    next.scrollTop = 0;
+    updateUI();
+  };
+
+  window.prevStep = function() {
+    if (currentStep <= 0) return;
+    document.getElementById(STEP_IDS[currentStep]).classList.remove('active');
+    currentStep--;
+    document.getElementById(STEP_IDS[currentStep]).classList.add('active');
+    updateUI();
+  };
+
+  // ── 须知勾选 ────────────────────────────────────
+  window.toggleCheck = function(label) {
+    const cb = label.querySelector('input[type=checkbox]');
+    const box = label.querySelector('.check-box');
+    cb.checked = !cb.checked;
+    box.classList.toggle('checked', cb.checked);
+    // 找当前须知索引
+    const id = label.closest('.step-screen').id;
+    const idx = parseInt(id.replace('screen-notice-', ''));
+    const btn = document.getElementById(`notice-btn-${idx}`);
+    if (btn) btn.disabled = !cb.checked;
+  };
+
+  // ── 表单验证步骤 ─────────────────────────────────
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    let err = el.parentNode.querySelector('.field-error');
+    if (!err) { err = document.createElement('div'); err.className = 'field-error'; el.parentNode.appendChild(err); }
+    err.textContent = msg;
+    el.focus();
+  }
+  function clearErrs(ids) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      const err = el?.parentNode?.querySelector('.field-error');
+      if (err) err.textContent = '';
+    });
+  }
+
+  window.submitOwnerStep = function() {
+    clearErrs(['f-name', 'f-phone']);
+    // Honeypot check
+    if (document.getElementById('hp-name').value) return;
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    if (!name) { showErr('f-name', '请填写您的姓名'); return; }
+    if (!phone) { showErr('f-phone', '请填写手机号码'); return; }
+    FORM_DATA.owner_name = name;
+    FORM_DATA.owner_phone = phone;
+    FORM_DATA.owner_wechat = document.getElementById('f-wechat').value.trim();
+    FORM_DATA.owner_email = document.getElementById('f-email').value.trim();
+    FORM_DATA.owner_address = document.getElementById('f-address').value.trim();
+    nextStep();
+  };
+
+  window.submitCatStep = function() {
+    clearErrs(['f-cat-name']);
+    const name = document.getElementById('f-cat-name').value.trim();
+    if (!name) { showErr('f-cat-name', '请填写猫咪名字'); return; }
+    FORM_DATA.cat_name = name;
+    FORM_DATA.cat_gender = document.getElementById('f-cat-gender').value;
+    FORM_DATA.cat_neutered = document.getElementById('f-cat-neutered').value;
+    FORM_DATA.cat_breed = document.getElementById('f-cat-breed').value.trim();
+    FORM_DATA.cat_age = document.getElementById('f-cat-age').value.trim();
+    FORM_DATA.cat_notes = document.getElementById('f-cat-notes').value.trim();
+    nextStep();
+  };
+
+  window.submitDatesStep = function() {
+    clearErrs(['f-checkin', 'f-checkout']);
+    const ci = document.getElementById('f-checkin').value;
+    const co = document.getElementById('f-checkout').value;
+    if (!ci) { showErr('f-checkin', '请选择入住日期'); return; }
+    if (!co) { showErr('f-checkout', '请选择退房日期'); return; }
+    if (co <= ci) { showErr('f-checkout', '退房日期须晚于入住日期'); return; }
+    FORM_DATA.check_in = ci;
+    FORM_DATA.check_out = co;
+    FORM_DATA.transport = document.getElementById('f-transport').value;
+    FORM_DATA.booking_notes = document.getElementById('f-booking-notes').value.trim();
+    nextStep();
+  };
+
+  window.submitDocsStep = function() {
+    const passport = document.getElementById('f-passport').files[0];
+    const vaccine = document.getElementById('f-vaccine').files[0];
+    if (!passport) { alert('请上传护照或身份证照片'); return; }
+    if (!vaccine) { alert('请上传疫苗接种证明'); return; }
+    nextStep();
+  };
+
+  // ── 日期天数计算 ─────────────────────────────────
+  ['f-checkin','f-checkout'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      const ci = document.getElementById('f-checkin').value;
+      const co = document.getElementById('f-checkout').value;
+      const el = document.getElementById('date-calc');
+      if (ci && co && co > ci) {
+        const days = Math.ceil((new Date(co) - new Date(ci)) / 86400000);
+        document.getElementById('date-days').textContent = days;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  });
+  // Set min date = today
+  document.getElementById('f-checkin').min = new Date().toLocaleDateString('en-CA');
+  document.getElementById('f-checkout').min = new Date().toLocaleDateString('en-CA');
+
+  // ── 文件上传预览 ─────────────────────────────────
+  window.handleUpload = function(input, boxId, previewId) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('文件大小不能超过 10MB'); input.value = ''; return; }
+    document.getElementById(boxId).classList.add('has-file');
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.getElementById(previewId);
+        img.src = e.target.result;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // PDF — just show filename
+      const preview = document.getElementById(previewId);
+      preview.style.display = 'none';
+      document.getElementById(boxId).querySelector('.upload-label').textContent = '✓ ' + file.name;
+    }
+  };
+
+  // ── 签名画板 ─────────────────────────────────────
+  const canvas = document.getElementById('sig-canvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let hasSig = false;
+
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = 200 * window.devicePixelRatio;
+    canvas.style.height = '200px';
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.strokeStyle = '#1A0A06';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  resizeCanvas();
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }
+
+  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; document.getElementById('sig-placeholder').style.display='none'; });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; document.getElementById('sig-placeholder').style.display='none'; }, { passive: false });
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  window.clearSignature = function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSig = false;
+    document.getElementById('sig-placeholder').style.display = 'flex';
+  };
+
+  // ── 最终提交 ─────────────────────────────────────
+  window.submitForm = async function() {
+    if (!hasSig) { alert('请在上方签名后再提交'); return; }
+    if (!checkRateLimit()) {
+      alert('您今日的提交次数已达上限（3次/天），如有疑问请直接联系我们。');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+
+    FORM_DATA.signature = canvas.toDataURL('image/png');
+    FORM_DATA.submitted_at = new Date().toISOString();
+    FORM_DATA.notices_confirmed = NOTICES.map(n => n.id);
+
+    try {
+      async function uploadFile(fileInput, path) {
+        const file = fileInput.files[0];
+        if (!file) return null;
+        const ext = file.name.split('.').pop();
+        const key = `${path}/${Date.now()}.${ext}`;
+        const { error } = await sb.storage.from('booking-docs').upload(key, file, { upsert: false });
+        if (error) throw error;
+        return key;
+      }
+
+      const passportPath = await uploadFile(document.getElementById('f-passport'), 'passports');
+      const vaccinePath = await uploadFile(document.getElementById('f-vaccine'), 'vaccines');
+      const catPhotoPath = await uploadFile(document.getElementById('f-catphoto'), 'cat-photos');
+
+      const { error } = await sb.from('booking_requests').insert({
+        token_id:      bookingTokenId,
+        owner_name:    FORM_DATA.owner_name,
+        owner_phone:   FORM_DATA.owner_phone,
+        owner_wechat:  FORM_DATA.owner_wechat || null,
+        owner_email:   FORM_DATA.owner_email || null,
+        owner_address: FORM_DATA.owner_address || null,
+        cat_name:      FORM_DATA.cat_name,
+        cat_gender:    FORM_DATA.cat_gender || null,
+        cat_neutered:  FORM_DATA.cat_neutered || null,
+        cat_breed:     FORM_DATA.cat_breed || null,
+        cat_age:       FORM_DATA.cat_age || null,
+        cat_notes:     FORM_DATA.cat_notes || null,
+        check_in_date: FORM_DATA.check_in,
+        check_out_date:FORM_DATA.check_out,
+        transport:     FORM_DATA.transport || null,
+        booking_notes: FORM_DATA.booking_notes || null,
+        signature_data:FORM_DATA.signature,
+        passport_file: passportPath,
+        vaccine_file:  vaccinePath,
+        cat_photo_file:catPhotoPath,
+        notices_confirmed: FORM_DATA.notices_confirmed,
+        status: 'pending',
+      });
+
+      if (error) throw error;
+
+      // 标记 token 已使用
+      if (bookingTokenId) {
+        await sb.from('booking_tokens').update({ used: true, used_at: new Date().toISOString() }).eq('id', bookingTokenId);
+      }
+
+      // 成功
+      document.getElementById('success-summary').innerHTML = `
+        <div>🐱 猫咪：<strong>${FORM_DATA.cat_name}</strong></div>
+        <div>📅 入住：<strong>${FORM_DATA.check_in}</strong></div>
+        <div>📅 退房：<strong>${FORM_DATA.check_out}</strong></div>
+        <div>📞 联系：<strong>${FORM_DATA.owner_phone}</strong></div>
+      `;
+      nextStep();
+    } catch(err) {
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = '提交预约申请';
+      alert('提交失败，请检查网络后重试。\n错误：' + (err.message || err));
+    }
+  };
+
+  // 启动时验证 token
+  validateToken();
+  updateUI();
+</script>
+</body>
+</html>

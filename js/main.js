@@ -24,6 +24,7 @@ import { openAddHomeVisit, openEditHomeVisit, deleteHomeVisit,
 
 import { loadDemoData, clearDemoData } from './demo.js';
 import { openTodayChart, openMonthChart, openYearChart } from './charts.js';
+import { openGenerateLink, generateBookingLink, copyBookingLink, resetGenLink, loadBookingRequests } from './booking.js';
 
 // ── 暴露到 window（供 HTML onclick 调用）────────────────────────
 Object.assign(window, {
@@ -43,6 +44,8 @@ Object.assign(window, {
   hideModal,
   // 演示数据
   loadDemoData, clearDemoData,
+  // 预约链接
+  openGenerateLink, generateBookingLink, copyBookingLink, resetGenLink,
   // 图表
   openTodayChart, openMonthChart, openYearChart,
   // 供 render.js 内部调用
@@ -62,6 +65,7 @@ async function loadInitial() {
   try {
     await loadAllData();
     renderAll();
+    loadBookingRequests().catch(() => {});
   } catch (err) {
     console.error(err);
     showToast('数据加载失败，请重试', 'error');

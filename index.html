@@ -254,6 +254,23 @@
   <div id="settings-tab" class="tab-content">
     <div class="settings-grid">
 
+      <!-- 预约链接生成器 -->
+      <div class="settings-section">
+        <div class="section-header" style="margin-bottom:12px">
+          <div>
+            <h2>🔗 发送预约链接</h2>
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:4px">生成专属链接发给客户，客户填写后自动绑定到您的账号</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openGenerateLink()">生成链接</button>
+        </div>
+        <div id="booking-requests-list">
+          <div class="empty-state" style="padding:24px">
+            <div class="empty-icon" style="font-size:32px">📋</div>
+            <p>暂无待处理的预约申请</p>
+          </div>
+        </div>
+      </div>
+
       <!-- 演示数据 -->
       <div class="settings-section demo-card">
         <div class="section-header" style="margin-bottom:0;flex-wrap:wrap;gap:12px">
@@ -334,6 +351,51 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- 生成预约链接 Modal -->
+  <div id="generate-link-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('generate-link-modal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔗 生成预约链接</h3>
+        <button class="modal-close" onclick="hideModal('generate-link-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="gen-link-form">
+          <div class="form-group">
+            <label class="form-label">客户姓名（选填，会预填到表单）</label>
+            <input class="form-input" id="gen-customer-name" placeholder="如：张小姐">
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <input class="form-input" id="gen-note" placeholder="内部备注，客户看不到">
+          </div>
+          <div class="form-group">
+            <label class="form-label">链接有效期</label>
+            <select class="form-select" id="gen-expires">
+              <option value="3">3 天</option>
+              <option value="7" selected>7 天</option>
+              <option value="14">14 天</option>
+              <option value="30">30 天</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" onclick="generateBookingLink()">生成链接</button>
+          </div>
+        </div>
+        <div id="gen-link-result" style="display:none">
+          <div style="background:rgba(52,199,89,0.08);border:1.5px solid rgba(52,199,89,0.25);border-radius:14px;padding:16px;margin-bottom:16px">
+            <div style="font-size:13px;font-weight:700;color:#2D6A35;margin-bottom:8px">✅ 链接已生成</div>
+            <div id="gen-link-url" style="font-size:13px;word-break:break-all;color:#333;line-height:1.6;user-select:all"></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="copyBookingLink()">复制链接</button>
+            <button class="btn btn-secondary" onclick="resetGenLink()">再生成一个</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
