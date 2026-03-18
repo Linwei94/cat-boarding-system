@@ -21,33 +21,31 @@ export async function openGenerateLink() {
   const btn = document.querySelector('[onclick="openGenerateLink()"]');
   if (btn) { btn.disabled = true; btn.textContent = '生成中…'; }
 
-  // 在任何 await 之前生成 token + 发起剪贴板（iOS 需要在用户手势内）
-  const token = crypto.randomUUID();
-  const base = window.location.origin + window.location.pathname.replace('index.html', '');
-  generatedLink = `${base}booking.html?token=${token}`;
-  const copyPromise = copyText(generatedLink);
-
   try {
     const { data: { user }, error: authErr } = await db.auth.getUser();
     if (authErr || !user) { showToast('请先登录', 'error'); return; }
 
     const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();
-    const { error } = await db.from('booking_tokens').insert({
-      token,
+    const { data, error } = await db.from('booking_tokens').insert({
       created_by: user.id,
       expires_at:  expiresAt,
-    });
+    }).select('token').single();
 
-    if (error) { showToast('生成失败：' + error.message, 'error'); return; }
+    if (error || !data) { showToast('生成失败：' + (error?.message ?? ''), 'error'); return; }
 
+    const base = window.location.origin + window.location.pathname.replace('index.html', '');
+    generatedLink = `${base}booking.html?token=${data.token}`;
+
+    // 刷新列表（让复制按钮出现）
+    await loadBookingRequests();
+
+    // 尝试复制（iOS HTTP 下可能失败，但链接已真实存在于 DB）
     try {
-      await copyPromise;
+      await copyText(generatedLink);
       showToast('🔗 链接已复制，发给客户即可！', 'success');
     } catch {
-      showToast('链接已生成，请点击列表中「复制」', 'warning');
+      showToast('链接已生成，点击列表「复制」按钮', 'warning');
     }
-
-    await loadBookingRequests();
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '+ 生成链接'; }
   }
