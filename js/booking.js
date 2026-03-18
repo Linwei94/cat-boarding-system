@@ -53,19 +53,12 @@ export function copyBookingLink() {
   });
 }
 
-export function resetGenLink() {
-  generatedLink = '';
-  document.getElementById('gen-link-form').style.display = '';
-  document.getElementById('gen-link-result').style.display = 'none';
-  document.getElementById('gen-link-btn-generate').style.display = '';
-  document.getElementById('gen-link-btn-copy').style.display = 'none';
-}
 
 // ── 加载预约申请列表 ────────────────────────────
 export async function loadBookingRequests() {
   const { data: tokens } = await db
     .from('booking_tokens')
-    .select('id, customer_name, note, used, expires_at, created_at')
+    .select('id, token, customer_name, note, used, expires_at, created_at')
     .order('created_at', { ascending: false })
     .limit(30);
 
@@ -138,7 +131,7 @@ export async function loadBookingRequests() {
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <span style="font-size:12px;color:#FF9500;font-weight:600">待填写</span>
-              <button class="btn btn-xs btn-secondary" onclick="recopyLink('${t.customer_name || ''}')">复制</button>
+              <button class="btn btn-xs btn-secondary" onclick="recopyLink('${t.token}')">复制</button>
             </div>
           </div>
         </div>`;
@@ -148,7 +141,17 @@ export async function loadBookingRequests() {
   container.innerHTML = rows || `<div class="empty-state"><div class="empty-icon">🔗</div><p>点击「生成链接」发给客户，<br>客户填写后自动显示在这里</p></div>`;
 }
 
+export function recopyLink(token) {
+  const base = window.location.origin + window.location.pathname.replace('index.html', '');
+  const url = `${base}booking.html?token=${token}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('链接已复制 ✓', 'success');
+  }).catch(() => {
+    prompt('复制此链接发给客户：', url);
+  });
+}
+
 // 挂载到 window 供 HTML 调用
 window.openGenerateLink = openGenerateLink;
 window.copyBookingLink = copyBookingLink;
-window.resetGenLink = resetGenLink;
+window.recopyLink = recopyLink;
