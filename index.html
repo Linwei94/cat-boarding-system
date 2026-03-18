@@ -253,19 +253,37 @@
        Tab 3：预约管理
        ============================================================ -->
   <div id="booking-tab" class="tab-content">
-    <div class="section-header">
-      <div>
-        <h2>🔗 预约管理</h2>
-        <p style="font-size:13px;color:var(--text-secondary);margin-top:2px">生成专属链接发给客户，客户填写后自动绑定到您的账号</p>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card warning">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-body">
+          <div class="stat-value" id="stat-booking-pending">-</div>
+          <div class="stat-label">待处理申请</div>
+        </div>
       </div>
+      <div class="stat-card success">
+        <div class="stat-icon">✅</div>
+        <div class="stat-body">
+          <div class="stat-value" id="stat-booking-confirmed">-</div>
+          <div class="stat-label">已确认预约</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 预约记录列表 -->
+    <div class="section-header">
+      <h2>预约申请</h2>
       <button class="btn btn-primary btn-sm" onclick="openGenerateLink()">+ 生成链接</button>
     </div>
     <div id="booking-requests-list">
       <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p>暂无预约记录</p>
+        <div class="empty-icon">🔗</div>
+        <p>点击「生成链接」发给客户，<br>客户填写后自动显示在这里</p>
       </div>
     </div>
+
   </div>
 
   <!-- ============================================================
@@ -362,18 +380,18 @@
     <div class="modal-overlay" onclick="hideModal('generate-link-modal')"></div>
     <div class="modal-content">
       <div class="modal-header">
-        <h3>🔗 生成预约链接</h3>
+        <h3>生成预约链接</h3>
         <button class="modal-close" onclick="hideModal('generate-link-modal')">✕</button>
       </div>
       <div class="modal-body">
         <div id="gen-link-form">
           <div class="form-group">
-            <label class="form-label">客户姓名（选填，会预填到表单）</label>
+            <label class="form-label">客户姓名 <span style="color:#bbb;font-weight:400">（选填，会预填到表单）</span></label>
             <input class="form-input" id="gen-customer-name" placeholder="如：张小姐">
           </div>
           <div class="form-group">
-            <label class="form-label">备注</label>
-            <input class="form-input" id="gen-note" placeholder="内部备注，客户看不到">
+            <label class="form-label">内部备注 <span style="color:#bbb;font-weight:400">（客户看不到）</span></label>
+            <input class="form-input" id="gen-note" placeholder="如：微信加友">
           </div>
           <div class="form-group">
             <label class="form-label">链接有效期</label>
@@ -384,19 +402,21 @@
               <option value="30">30 天</option>
             </select>
           </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" onclick="generateBookingLink()">生成链接</button>
-          </div>
         </div>
         <div id="gen-link-result" style="display:none">
-          <div style="background:rgba(52,199,89,0.08);border:1.5px solid rgba(52,199,89,0.25);border-radius:14px;padding:16px;margin-bottom:16px">
-            <div style="font-size:13px;font-weight:700;color:#2D6A35;margin-bottom:8px">✅ 链接已生成</div>
-            <div id="gen-link-url" style="font-size:13px;word-break:break-all;color:#333;line-height:1.6;user-select:all"></div>
+          <div style="background:rgba(52,199,89,0.07);border:1.5px solid rgba(52,199,89,0.22);border-radius:16px;padding:18px 20px;margin-bottom:4px">
+            <div style="font-size:12px;font-weight:700;color:#2D6A35;letter-spacing:0.5px;margin-bottom:8px">✅ 链接已生成，发给客户即可</div>
+            <div id="gen-link-url" style="font-size:13px;word-break:break-all;color:#333;line-height:1.7;user-select:all;font-family:monospace"></div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-primary" onclick="copyBookingLink()">复制链接</button>
-            <button class="btn btn-secondary" onclick="resetGenLink()">再生成一个</button>
-          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="gen-link-btn-generate">
+          <button class="btn btn-primary" style="width:100%" onclick="generateBookingLink()">生成链接 🔗</button>
+        </div>
+        <div id="gen-link-btn-copy" style="display:none;display:none;flex-direction:column;gap:8px">
+          <button class="btn btn-primary" style="width:100%" onclick="copyBookingLink()">复制链接</button>
+          <button class="btn btn-secondary" style="width:100%" onclick="resetGenLink()">再生成一个</button>
         </div>
       </div>
     </div>
