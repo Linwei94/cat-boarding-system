@@ -466,6 +466,11 @@
       <label class="form-label">特殊需求 / 饮食习惯</label>
       <textarea class="form-textarea" id="f-cat-notes" placeholder="如：每天需喂药、只吃湿粮、怕陌生人等..."></textarea>
     </div>
+
+    <!-- 额外猫咪 -->
+    <div id="extra-cats-container"></div>
+    <button type="button" class="btn-secondary" style="width:100%;margin-bottom:4px" onclick="addExtraCat()">➕ 还有其他猫咪</button>
+
     <div class="btn-area">
       <button class="btn-primary" onclick="submitCatStep()">下一步 →</button>
       <button class="btn-secondary" onclick="prevStep()">← 返回</button>
@@ -790,7 +795,73 @@
     FORM_DATA.cat_breed = document.getElementById('f-cat-breed').value.trim();
     FORM_DATA.cat_age = document.getElementById('f-cat-age').value.trim();
     FORM_DATA.cat_notes = document.getElementById('f-cat-notes').value.trim();
+    // 收集额外猫咪
+    FORM_DATA.additional_cats = [];
+    document.querySelectorAll('.extra-cat-card').forEach((card, i) => {
+      const n = card.querySelector('.ec-name').value.trim();
+      if (!n) return; // skip blank extra cats
+      FORM_DATA.additional_cats.push({
+        cat_name:    n,
+        cat_gender:  card.querySelector('.ec-gender').value,
+        cat_neutered:card.querySelector('.ec-neutered').value,
+        cat_breed:   card.querySelector('.ec-breed').value.trim(),
+        cat_age:     card.querySelector('.ec-age').value.trim(),
+        cat_notes:   card.querySelector('.ec-notes').value.trim(),
+      });
+    });
     nextStep();
+  };
+
+  let extraCatCount = 0;
+  window.addExtraCat = function() {
+    extraCatCount++;
+    const idx = extraCatCount;
+    const div = document.createElement('div');
+    div.className = 'extra-cat-card';
+    div.style.cssText = 'background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:700">🐱 第 ${idx + 1} 只猫咪</span>
+        <button type="button" onclick="this.closest('.extra-cat-card').remove()" style="background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:0 4px">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">猫咪名字 <span class="req">*</span></label>
+        <input class="form-input ec-name" placeholder="猫咪的名字">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">性别</label>
+          <select class="form-select ec-gender">
+            <option value="">请选择</option>
+            <option value="male">弟弟（公猫）</option>
+            <option value="female">妹妹（母猫）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">是否绝育</label>
+          <select class="form-select ec-neutered">
+            <option value="">请选择</option>
+            <option value="yes">是</option>
+            <option value="no">否</option>
+            <option value="unknown">不确定</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">品种</label>
+          <input class="form-input ec-breed" placeholder="如：英短、橘猫">
+        </div>
+        <div class="form-group">
+          <label class="form-label">年龄</label>
+          <input class="form-input ec-age" placeholder="如：2岁">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">特殊需求</label>
+        <textarea class="form-textarea ec-notes" placeholder="如：每天需喂药..."></textarea>
+      </div>`;
+    document.getElementById('extra-cats-container').appendChild(div);
   };
 
   window.submitDatesStep = function() {
@@ -947,6 +1018,7 @@
         vaccine_file:  vaccinePath,
         cat_photo_file:catPhotoPath,
         notices_confirmed: FORM_DATA.notices_confirmed,
+        additional_cats: FORM_DATA.additional_cats?.length ? FORM_DATA.additional_cats : null,
         status: 'pending',
       }).select('id').single();
 
@@ -968,8 +1040,9 @@
       }
 
       // 成功
+      const allCatNames = [FORM_DATA.cat_name, ...(FORM_DATA.additional_cats||[]).map(c=>c.cat_name)].join('、');
       document.getElementById('success-summary').innerHTML = `
-        <div>🐱 猫咪：<strong>${FORM_DATA.cat_name}</strong></div>
+        <div>🐱 猫咪：<strong>${allCatNames}</strong></div>
         <div>📅 入住：<strong>${FORM_DATA.check_in}</strong></div>
         <div>📅 退房：<strong>${FORM_DATA.check_out}</strong></div>
         <div>📞 联系：<strong>${FORM_DATA.owner_phone}</strong></div>

@@ -99,6 +99,9 @@ export async function saveAdminEmail() {
   else showToast('通知邮箱已保存 ✓', 'success');
 }
 
+// ── 缓存完整预约记录（供详情弹窗使用） ──────────────
+let _cachedRequests = [];
+
 // ── 加载预约申请列表 ────────────────────────────
 export async function loadBookingRequests() {
   const { data: tokens } = await db
@@ -120,11 +123,12 @@ export async function loadBookingRequests() {
   if (tokenIds.length > 0) {
     const { data } = await db
       .from('booking_requests')
-      .select('token_id, owner_name, cat_name, check_in_date, check_out_date, status, submitted_at')
+      .select('id, token_id, owner_name, owner_phone, owner_wechat, owner_email, owner_address, cat_name, cat_gender, cat_neutered, cat_breed, cat_age, cat_notes, additional_cats, check_in_date, check_out_date, transport, booking_notes, status, submitted_at')
       .in('token_id', tokenIds)
       .order('submitted_at', { ascending: false });
     if (data) requests = data;
   }
+  _cachedRequests = requests;
 
   const container = document.getElementById('booking-requests-list');
   const now = new Date();
@@ -153,23 +157,21 @@ export async function loadBookingRequests() {
     const num = `#${tokens.length - i}`;
 
     if (req) {
-      // 已填写 → 默认折叠
+      // 已填写 → 点击打开详情弹窗
+      const catNames = req.additional_cats?.length
+        ? `${req.cat_name} 等${1 + req.additional_cats.length}只`
+        : req.cat_name;
       return `
         <div class="settings-section booking-filled-card" style="margin-bottom:10px;overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;cursor:pointer" onclick="toggleBookingCard('${t.id}')">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;cursor:pointer" onclick="openBookingDetail('${req.id}')">
             <div style="min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <span style="font-size:14px;font-weight:700">🐱 ${req.cat_name} · ${req.owner_name}</span>
+                <span style="font-size:14px;font-weight:700">🐱 ${catNames} · ${req.owner_name}</span>
                 ${statusBadge[req.status] || req.status}
               </div>
               <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${req.check_in_date} → ${req.check_out_date}</div>
             </div>
-            <span id="arrow-${t.id}" style="font-size:16px;color:var(--text-secondary);transition:transform 0.2s;flex-shrink:0">›</span>
-          </div>
-          <div id="detail-${t.id}" class="hidden" style="padding:0 16px 14px;border-top:1px solid var(--border)">
-            <div style="font-size:11px;color:var(--text-secondary);margin:10px 0 6px">${num} · ${createdDate}</div>
-            ${t.note ? `<div style="font-size:12px;color:#bbb;margin-bottom:8px">${t.note}</div>` : ''}
-            <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteBookingToken('${t.id}')">删除</button>
+            <span style="font-size:16px;color:var(--text-secondary);flex-shrink:0">›</span>
           </div>
         </div>`;
     } else if (expired) {
@@ -235,6 +237,109 @@ export function recopyLink(token) {
   });
 }
 
+// ── 预约详情弹窗 ──────────────────────────────────
+let _activeRequestId = null;
+
+function genderLabel(v) {
+  return v === 'male' ? '弟弟（公猫）' : v === 'female' ? '妹妹（母猫）' : v || '-';
+}
+function neuteredLabel(v) {
+  return v === 'yes' ? '是' : v === 'no' ? '否' : v === 'unknown' ? '不确定' : '-';
+}
+function transportLabel(v) {
+  return v === 'self' ? '自送' : v === 'pickup' ? '上门接送' : v || '-';
+}
+
+function catBlock(label, cat) {
+  return `
+    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">${label}</div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">名字</span><span class="detail-val">${cat.cat_name || '-'}</span></div>
+        <div class="detail-item"><span class="detail-label">性别</span><span class="detail-val">${genderLabel(cat.cat_gender)}</span></div>
+        <div class="detail-item"><span class="detail-label">绝育</span><span class="detail-val">${neuteredLabel(cat.cat_neutered)}</span></div>
+        <div class="detail-item"><span class="detail-label">品种</span><span class="detail-val">${cat.cat_breed || '-'}</span></div>
+        <div class="detail-item"><span class="detail-label">年龄</span><span class="detail-val">${cat.cat_age || '-'}</span></div>
+        ${cat.cat_notes ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">备注</span><span class="detail-val">${cat.cat_notes}</span></div>` : ''}
+      </div>
+    </div>`;
+}
+
+export function openBookingDetail(requestId) {
+  const req = _cachedRequests.find(r => r.id === requestId);
+  if (!req) return;
+  _activeRequestId = requestId;
+
+  const extraCats = req.additional_cats || [];
+  const allCatBlocks = [
+    catBlock(extraCats.length ? '🐱 第 1 只猫咪' : '🐱 猫咪信息', req),
+    ...extraCats.map((c, i) => catBlock(`🐱 第 ${i + 2} 只猫咪`, c)),
+  ].join('');
+
+  const body = document.getElementById('booking-detail-body');
+  body.innerHTML = `
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">
+      提交于 ${req.submitted_at?.slice(0, 16).replace('T', ' ')}
+    </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">主人信息</div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">姓名</span><span class="detail-val">${req.owner_name}</span></div>
+        <div class="detail-item"><span class="detail-label">电话</span><span class="detail-val"><a href="tel:${req.owner_phone}" style="color:var(--primary)">${req.owner_phone}</a></span></div>
+        ${req.owner_wechat ? `<div class="detail-item"><span class="detail-label">微信</span><span class="detail-val">${req.owner_wechat}</span></div>` : ''}
+        ${req.owner_email ? `<div class="detail-item"><span class="detail-label">邮箱</span><span class="detail-val">${req.owner_email}</span></div>` : ''}
+        ${req.owner_address ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">地址</span><span class="detail-val">${req.owner_address}</span></div>` : ''}
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">猫咪信息</div>
+    ${allCatBlocks}
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">寄养安排</div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">入住</span><span class="detail-val">${req.check_in_date}</span></div>
+        <div class="detail-item"><span class="detail-label">退房</span><span class="detail-val">${req.check_out_date}</span></div>
+        <div class="detail-item"><span class="detail-label">接送</span><span class="detail-val">${transportLabel(req.transport)}</span></div>
+        ${req.booking_notes ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">备注</span><span class="detail-val">${req.booking_notes}</span></div>` : ''}
+      </div>
+    </div>
+  `;
+
+  // 根据当前状态调整按钮
+  const confirmBtn = document.getElementById('bd-confirm-btn');
+  const rejectBtn  = document.getElementById('bd-reject-btn');
+  if (req.status === 'confirmed') {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = '✅ 已确认';
+  } else {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '✅ 确认入住';
+  }
+  if (req.status === 'rejected') {
+    rejectBtn.disabled = true;
+    rejectBtn.textContent = '已取消';
+  } else {
+    rejectBtn.disabled = false;
+    rejectBtn.textContent = '✕ 取消预约';
+  }
+
+  showModal('booking-detail-modal');
+}
+
+export async function updateBookingStatus(status) {
+  if (!_activeRequestId) return;
+  const { error } = await db
+    .from('booking_requests')
+    .update({ status })
+    .eq('id', _activeRequestId);
+  if (error) { showToast('更新失败：' + error.message, 'error'); return; }
+  showToast(status === 'confirmed' ? '已确认入住 ✓' : '已取消预约', 'success');
+  hideModal('booking-detail-modal');
+  await loadBookingRequests();
+}
+
 // 挂载到 window 供 HTML 调用
 window.openGenerateLink   = openGenerateLink;
 window.copyBookingLink    = copyBookingLink;
@@ -243,3 +348,5 @@ window.recopyLink         = recopyLink;
 window.deleteBookingToken = deleteBookingToken;
 window.toggleBookingCard  = toggleBookingCard;
 window.saveAdminEmail     = saveAdminEmail;
+window.openBookingDetail  = openBookingDetail;
+window.updateBookingStatus = updateBookingStatus;

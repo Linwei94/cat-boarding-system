@@ -25,7 +25,7 @@ import { openAddHomeVisit, openEditHomeVisit, deleteHomeVisit,
 
 import { loadDemoData, clearDemoData } from './demo.js';
 import { openTodayChart, openMonthChart, openYearChart } from './charts.js';
-import { openGenerateLink, copyBookingLink, copyFromLinkModal, recopyLink, deleteBookingToken, toggleBookingCard, loadBookingRequests, loadAdminEmail, saveAdminEmail } from './booking.js';
+import { openGenerateLink, copyBookingLink, copyFromLinkModal, recopyLink, deleteBookingToken, toggleBookingCard, loadBookingRequests, loadAdminEmail, saveAdminEmail, openBookingDetail, updateBookingStatus } from './booking.js';
 
 // ── 暴露到 window（供 HTML onclick 调用）────────────────────────
 Object.assign(window, {

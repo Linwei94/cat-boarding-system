@@ -852,6 +852,22 @@
   </div>
 </div>
 
+<!-- 预约详情弹窗 -->
+<div id="booking-detail-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('booking-detail-modal')"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3>预约详情</h3>
+      <button class="modal-close" onclick="hideModal('booking-detail-modal')">✕</button>
+    </div>
+    <div id="booking-detail-body" style="padding:20px;overflow-y:auto"></div>
+    <div class="modal-footer" style="display:flex;gap:8px;padding:16px">
+      <button id="bd-confirm-btn" class="btn btn-primary btn-sm" style="flex:1" onclick="updateBookingStatus('confirmed')">✅ 确认入住</button>
+      <button id="bd-reject-btn" class="btn btn-danger btn-sm" style="flex:1" onclick="updateBookingStatus('rejected')">✕ 取消预约</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast 通知 -->
 <div id="toast" class="toast"></div>
 
