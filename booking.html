@@ -915,7 +915,7 @@
       const vaccinePath = await uploadFile(document.getElementById('f-vaccine'), 'vaccines');
       const catPhotoPath = await uploadFile(document.getElementById('f-catphoto'), 'cat-photos');
 
-      const { error } = await sb.from('booking_requests').insert({
+      const { data: insertedRequest, error } = await sb.from('booking_requests').insert({
         token_id:      bookingTokenId,
         owner_name:    FORM_DATA.owner_name,
         owner_phone:   FORM_DATA.owner_phone,
@@ -938,13 +938,23 @@
         cat_photo_file:catPhotoPath,
         notices_confirmed: FORM_DATA.notices_confirmed,
         status: 'pending',
-      });
+      }).select('id').single();
 
       if (error) throw error;
 
       // 标记 token 已使用
       if (bookingTokenId) {
         await sb.from('booking_tokens').update({ used: true, used_at: new Date().toISOString() }).eq('id', bookingTokenId);
+      }
+
+      // 发送邮件通知（Edge Function，失败不影响提交流程）
+      if (insertedRequest?.id) {
+        const fnUrl = SUPABASE_URL.replace('supabase.co', 'supabase.co') + '/functions/v1/notify-booking';
+        fetch(fnUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+          body: JSON.stringify({ booking_request_id: insertedRequest.id }),
+        }).catch(() => {});
       }
 
       // 成功

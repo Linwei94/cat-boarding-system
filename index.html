@@ -310,6 +310,18 @@
   <div id="settings-tab" class="tab-content">
     <div class="settings-grid">
 
+      <!-- 通知设置 -->
+      <div class="settings-section">
+        <h2 style="font-size:15px;font-weight:700;margin:0 0 14px">🔔 预约通知邮箱</h2>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px">客户填写预约后，自动发送邮件到此地址</p>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="email" id="notification-email" placeholder="your@email.com"
+            style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;background:white;font-family:inherit;outline:none">
+          <button class="btn btn-primary btn-sm" onclick="saveAdminEmail()">保存</button>
+        </div>
+        <p id="notification-email-hint" style="font-size:11px;color:var(--text-secondary);margin:8px 0 0">需先在 Supabase 部署 notify-booking Edge Function 并配置 RESEND_API_KEY</p>
+      </div>
+
       <!-- 演示数据 -->
       <div class="settings-section demo-card">
         <div class="section-header" style="margin-bottom:0;flex-wrap:wrap;gap:12px">
@@ -814,6 +826,24 @@
       <div class="modal-footer">
         <button class="btn btn-secondary btn-sm" id="hv-detail-edit-btn">编辑</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 链接已生成 Modal -->
+<div id="link-ready-modal" class="modal hidden">
+  <div class="modal-overlay" onclick="hideModal('link-ready-modal')"></div>
+  <div class="modal-content" style="max-width:400px">
+    <div class="modal-header">
+      <h3>🔗 链接已生成</h3>
+      <button class="modal-close" onclick="hideModal('link-ready-modal')">✕</button>
+    </div>
+    <div style="padding:16px 24px 8px">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px">点击下方按钮复制链接，发给客户即可</p>
+      <div id="link-ready-url" style="font-size:11px;color:var(--text-secondary);word-break:break-all;background:rgba(255,107,107,0.06);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:16px;user-select:all;-webkit-user-select:all"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" style="font-size:16px;padding:14px" onclick="copyFromLinkModal()">📋 复制链接</button>
     </div>
   </div>
 </div>

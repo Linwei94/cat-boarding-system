@@ -1,0 +1,68 @@
+<h2>客户入驻表单 — 设计方案</h2>
+<p class="subtitle">请选择您偏好的表单向导风格</p>
+
+<div class="cards">
+  <div class="card" data-choice="A" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#FFF8F5,#FFE8E0);padding:24px;border-radius:12px;margin-bottom:12px">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#FF6B6B;color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">1</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:13px;color:#999">2</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:13px;color:#999">3</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:13px;color:#999">✍</div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">⚠️ 重要须知</div>
+        <div style="font-size:12px;color:#666;line-height:1.6">寄养期间请确保已注射疫苗，如有特殊饮食需求请提前告知...</div>
+        <div style="margin-top:12px;background:#FF6B6B;color:white;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-align:center">我已阅读并同意 →</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 顶部步骤条</h3>
+      <p>顶部显示步骤进度，每步先弹出须知卡片，点击确认后才能继续填写</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="B" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#F5F8FF,#E0E8FF);padding:24px;border-radius:12px;margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 6px rgba(0,0,0,0.06)">
+          <div style="width:24px;height:24px;border-radius:50%;background:#4CAF50;color:white;display:flex;align-items:center;justify-content:center;font-size:11px">✓</div>
+          <div style="font-size:13px;font-weight:600;color:#333">① 基本信息</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:#FF6B6B;border-radius:10px;padding:10px 14px">
+          <div style="width:24px;height:24px;border-radius:50%;background:white;color:#FF6B6B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">2</div>
+          <div style="font-size:13px;font-weight:600;color:white">② 须知确认 ← 当前</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 6px rgba(0,0,0,0.06);opacity:0.5">
+          <div style="width:24px;height:24px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:11px">3</div>
+          <div style="font-size:13px;color:#999">③ 资料上传（待解锁）</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 左侧侧边栏步骤</h3>
+      <p>桌面端左侧显示全部步骤列表，已完成打勾，未解锁置灰，适合桌面浏览器</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="C" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#F5FFF8,#E0FFE8);padding:24px;border-radius:12px;margin-bottom:12px">
+      <div style="text-align:center">
+        <div style="font-size:40px;margin-bottom:8px">📋</div>
+        <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:6px">第 2 步 / 共 5 步</div>
+        <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:left">
+          <div style="font-size:13px;font-weight:700;color:#FF6B6B;margin-bottom:6px">须知 · 疫苗要求</div>
+          <div style="font-size:12px;color:#555;line-height:1.6">所有寄养猫咪须在入住前完成三联疫苗接种，并提供接种证明...</div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <div style="flex:1;text-align:center;border:1px solid #ddd;border-radius:8px;padding:6px;font-size:12px;color:#666">← 上一步</div>
+            <div style="flex:1;text-align:center;background:#FF6B6B;border-radius:8px;padding:6px;font-size:12px;color:white;font-weight:700">确认并继续 →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 全屏卡片式</h3>
+      <p>每个步骤占满整屏，须知和表单交替出现，最沉浸、最适合手机端</p>
+    </div>
+  </div>
+</div>
