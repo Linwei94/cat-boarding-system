@@ -329,6 +329,7 @@
     }
     .success-icon { font-size: 80px; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
     @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } }
     .success-title { font-size: 24px; font-weight: 800; }
     .success-sub { font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 300px; }
 
@@ -352,8 +353,14 @@
 
 <div id="wizard">
 
+  <!-- 加载中 -->
+  <div class="step-screen active" id="screen-loading" style="justify-content:center;align-items:center;text-align:center;gap:20px">
+    <div style="font-size:52px;animation:pulse 1.2s ease-in-out infinite">🐱</div>
+    <div style="font-size:16px;color:var(--text-secondary)">正在验证链接…</div>
+  </div>
+
   <!-- 无效/过期 token 页 -->
-  <div class="step-screen active" id="screen-invalid" style="justify-content:center;align-items:center;text-align:center;gap:20px">
+  <div class="step-screen" id="screen-invalid" style="justify-content:center;align-items:center;text-align:center;gap:20px">
     <div style="font-size:64px">🔒</div>
     <div style="font-size:20px;font-weight:800">链接无效或已过期</div>
     <div style="font-size:14px;color:var(--text-secondary);line-height:1.7;max-width:280px">
@@ -613,15 +620,17 @@
     if (data.customer_name) {
       document.getElementById('f-name').value = data.customer_name;
     }
-    // 显示欢迎页
-    document.getElementById('screen-invalid').classList.remove('active');
+    // 验证通过：隐藏 loading，显示欢迎页
+    document.getElementById('screen-loading').classList.remove('active');
     document.getElementById('screen-welcome').classList.add('active');
-    currentStep = 1; // skip invalid screen
+    currentStep = 1;
   }
 
   function showInvalid(msg) {
+    document.getElementById('screen-loading').classList.remove('active');
+    document.getElementById('screen-invalid').classList.add('active');
     const el = document.querySelector('#screen-invalid div:nth-child(3)');
-    if (el) el.textContent = msg || '链接无效或已过期';
+    if (el && msg) el.textContent = msg;
   }
 
   // ── 防刷保护（简单速率限制） ──────────────────────
