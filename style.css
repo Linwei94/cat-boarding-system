@@ -820,9 +820,7 @@ body {
 .btn-outline:hover { background: rgba(255,255,255,0.85); }
 
 .btn-sm { padding: 7px 16px; font-size: 13px; }
-.btn-xs { padding: 4px 10px; font-size: 12px; }
-.btn-xs.btn-secondary { background: transparent; color: var(--text-secondary); border: 1.5px solid rgba(120,80,70,0.3); box-shadow: none; }
-.btn-xs.btn-secondary:hover { background: rgba(120,80,70,0.06); }
+.btn-xs { padding: 5px 12px; font-size: 12px; }
 .btn-xs.btn-danger { background: transparent; color: var(--danger); border: 1.5px solid rgba(255,59,48,0.4); box-shadow: none; }
 .btn-xs.btn-danger:hover { background: rgba(255,59,48,0.08); }
 .btn-full { width: 100%; justify-content: center; }
