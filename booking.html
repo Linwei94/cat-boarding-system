@@ -603,7 +603,7 @@
       .eq('token', token)
       .single();
 
-    if (error || !data) return showInvalid();
+    if (error || !data) return showInvalid(error ? `[调试] ${error.code}: ${error.message}` : '[调试] 未找到此 token');
     if (data.used) return showInvalid('此链接已被使用，每个链接只能提交一次。');
     if (new Date(data.expires_at) < new Date()) return showInvalid('此链接已过期，请联系寄养管家获取新链接。');
 
@@ -619,10 +619,8 @@
   }
 
   function showInvalid(msg) {
-    if (msg) {
-      document.querySelector('#screen-invalid div:nth-child(3)').textContent = msg;
-    }
-    // already showing invalid screen by default
+    const el = document.querySelector('#screen-invalid div:nth-child(3)');
+    if (el) el.textContent = msg || '链接无效或已过期';
   }
 
   // ── 防刷保护（简单速率限制） ──────────────────────
