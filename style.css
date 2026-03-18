@@ -115,10 +115,23 @@ body {
 
 .error-msg {
   font-size: 13px;
-  margin-top: 10px;
-  min-height: 20px;
+  margin-top: 12px;
   color: var(--danger);
+  display: none;
+  background: rgba(255,59,48,0.07);
+  border: 1px solid rgba(255,59,48,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: left;
+  line-height: 1.5;
 }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-6px); }
+  40%,80%  { transform: translateX(6px); }
+}
+#login-form.shake { animation: shake 0.4s ease; }
 
 .error-msg.success {
   color: var(--success);

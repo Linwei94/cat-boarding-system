@@ -29,13 +29,33 @@ export function initAuth(onSignedIn) {
   // Login form
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
+    const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    const errorEl = document.getElementById('login-error');
+    const errorEl  = document.getElementById('login-error');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+
     errorEl.className = 'error-msg';
     errorEl.textContent = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = '登录中…';
+
     const { error } = await db.auth.signInWithPassword({ email, password });
-    if (error) errorEl.textContent = '登录失败：' + (error.message === 'Invalid login credentials' ? '邮箱或密码错误' : error.message);
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = '登录';
+
+    if (error) {
+      const msg = error.message === 'Invalid login credentials'
+        ? '邮箱或密码错误，请检查后重试'
+        : error.message === 'Email not confirmed'
+        ? '请先验证邮箱后再登录'
+        : ('登录失败：' + error.message);
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+      // 轻震动提示
+      document.getElementById('login-form').classList.add('shake');
+      setTimeout(() => document.getElementById('login-form').classList.remove('shake'), 500);
+    }
   });
 
   // Register button
