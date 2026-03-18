@@ -379,11 +379,6 @@ body {
   display: block;
 }
 
-#booking-tab.active {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100dvh - 96px - env(safe-area-inset-top));
-}
 
 /* ================================================================
    统计卡片
