@@ -724,6 +724,7 @@
     next.classList.add('active');
     next.scrollTop = 0;
     updateUI();
+    if (STEP_IDS[currentStep] === 'screen-sign') resizeCanvas();
   };
 
   window.prevStep = function() {
@@ -880,9 +881,9 @@
     return { x: src.clientX - rect.left, y: src.clientY - rect.top };
   }
 
-  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+  canvas.addEventListener('mousedown', e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
   canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; document.getElementById('sig-placeholder').style.display='none'; });
-  canvas.addEventListener('mouseup', () => drawing = false);
+  window.addEventListener('mouseup', () => drawing = false);
   canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, { passive: false });
   canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; document.getElementById('sig-placeholder').style.display='none'; }, { passive: false });
   canvas.addEventListener('touchend', () => drawing = false);
@@ -958,7 +959,7 @@
 
       // 发送邮件通知（Edge Function，失败不影响提交流程）
       if (insertedRequest?.id) {
-        const fnUrl = SUPABASE_URL.replace('supabase.co', 'functions.supabase.co') + '/functions/v1/notify-booking';
+        const fnUrl = SUPABASE_URL + '/functions/v1/notify-booking';
         fetch(fnUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
