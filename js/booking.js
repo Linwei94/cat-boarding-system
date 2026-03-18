@@ -3,41 +3,39 @@ import { showModal, hideModal, showToast } from './ui.js';
 
 let generatedLink = '';
 
-export function openGenerateLink() {
-  generatedLink = '';
-  document.getElementById('gen-link-form').style.display = '';
-  document.getElementById('gen-link-result').style.display = 'none';
-  document.getElementById('gen-link-btn-generate').style.display = '';
-  document.getElementById('gen-link-btn-copy').style.display = 'none';
-  document.getElementById('gen-customer-name').value = '';
-  document.getElementById('gen-note').value = '';
-  showModal('generate-link-modal');
-}
+export async function openGenerateLink() {
+  const btn = document.querySelector('[onclick="openGenerateLink()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '生成中…'; }
 
-export async function generateBookingLink() {
-  const customerName = document.getElementById('gen-customer-name').value.trim();
-  const note = document.getElementById('gen-note').value.trim();
-  const days = parseInt(document.getElementById('gen-expires').value);
-  const expiresAt = new Date(Date.now() + days * 86400000).toISOString();
+  try {
+    const { data: { user }, error: authErr } = await db.auth.getUser();
+    if (authErr || !user) { showToast('请先登录', 'error'); return; }
 
-  const { data: { user } } = await db.auth.getUser();
-  const { data, error } = await db.from('booking_tokens').insert({
-    created_by:    user.id,
-    customer_name: customerName || null,
-    note:          note || null,
-    expires_at:    expiresAt,
-  }).select('token').single();
+    const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();
+    const { data, error } = await db.from('booking_tokens').insert({
+      created_by: user.id,
+      expires_at:  expiresAt,
+    }).select('token').single();
 
-  if (error) { showToast('生成失败：' + error.message, 'error'); return; }
+    if (error) { showToast('生成失败：' + error.message, 'error'); return; }
 
-  const base = window.location.origin + window.location.pathname.replace('index.html', '');
-  generatedLink = `${base}booking.html?token=${data.token}`;
+    const base = window.location.origin + window.location.pathname.replace('index.html', '');
+    generatedLink = `${base}booking.html?token=${data.token}`;
 
-  document.getElementById('gen-link-url').textContent = generatedLink;
-  document.getElementById('gen-link-form').style.display = 'none';
-  document.getElementById('gen-link-result').style.display = '';
-  document.getElementById('gen-link-btn-generate').style.display = 'none';
-  document.getElementById('gen-link-btn-copy').style.display = 'flex';
+    // 直接复制到剪贴板
+    try {
+      await navigator.clipboard.writeText(generatedLink);
+      showToast('🔗 链接已复制，发给客户即可！', 'success');
+    } catch {
+      // 降级：弹出链接让用户手动复制
+      prompt('复制此链接发给客户：', generatedLink);
+    }
+
+    // 刷新列表
+    await loadBookingRequests();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '+ 生成链接'; }
+  }
 }
 
 export function copyBookingLink() {

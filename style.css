@@ -77,6 +77,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 24px 20px;
   background: linear-gradient(160deg, #FFE8E3 0%, #FFF2EE 40%, #F5EDEA 70%, #FCEEE8 100%);
 }
 
@@ -363,6 +364,12 @@ body {
 
 .tab-content.active {
   display: block;
+}
+
+#booking-tab.active {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 96px - env(safe-area-inset-top));
 }
 
 /* ================================================================
