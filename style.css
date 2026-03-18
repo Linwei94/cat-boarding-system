@@ -1057,16 +1057,203 @@ body {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Detail grid for booking detail modal */
+/* ================================================================
+   Grouped modal (owner/cat/booking detail) — warm bg base
+   ================================================================ */
+.modal-grouped {
+  background: var(--bg) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* keep header/footer white within grouped modal */
+.modal-grouped .modal-header,
+.modal-grouped .modal-footer {
+  background: var(--surface);
+}
+/* inner detail-info-grid: white card on cream bg */
+.modal-grouped .detail-info-grid {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* ================================================================
+   Booking Detail — new iOS-native design
+   ================================================================ */
+
+/* Hero banner */
+.bd-hero {
+  position: relative;
+  background: linear-gradient(145deg, #FF6B6B, #FF9361);
+  padding: 28px 24px 24px;
+  text-align: center;
+  color: white;
+}
+.bd-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.22);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.bd-hero-emoji { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+.bd-hero-names { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
+.bd-hero-owner { font-size: 14px; opacity: 0.85; margin-top: 3px; }
+.bd-hero-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.bd-hero-dates {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+.bd-hero-arrow { opacity: 0.7; }
+.bd-hero-nights {
+  background: rgba(255,255,255,0.22);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* iOS-style grouped sections */
+.bd-section { padding: 0 16px; margin-top: 24px; }
+.bd-section:last-of-type { margin-bottom: 8px; }
+.bd-section-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 4px 6px;
+}
+.bd-rows {
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.bd-row {
+  display: flex;
+  align-items: baseline;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.bd-row:last-child { border-bottom: none; }
+.bd-row-full { flex-direction: column; gap: 3px; }
+.bd-row-label {
+  font-size: 14px;
+  color: var(--text-light);
+  flex-shrink: 0;
+  width: 36px;
+}
+.bd-row-full .bd-row-label { width: auto; }
+.bd-row-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  text-align: right;
+  word-break: break-word;
+}
+.bd-row-full .bd-row-value { text-align: left; color: var(--text-secondary); }
+.bd-link { color: var(--primary); text-decoration: none; }
+
+/* Multi-cat tabs */
+.bd-cat-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.bd-cat-tabs::-webkit-scrollbar { display: none; }
+.bd-cat-tab {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.18s;
+}
+.bd-cat-tab.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.bd-cat-panel { display: none; }
+.bd-cat-panel.active { display: block; }
+
+/* Footer action buttons */
+.bd-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  position: sticky;
+  bottom: 0;
+}
+.bd-action-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.bd-action-btn:active { opacity: 0.75; transform: scale(0.98); }
+.bd-action-btn:disabled { opacity: 0.35; cursor: default; transform: none; }
+.bd-action-confirm {
+  background: linear-gradient(135deg, #34C759, #30B855);
+  color: white;
+  box-shadow: 0 4px 16px rgba(52,199,89,0.30);
+}
+.bd-action-reject {
+  background: rgba(255,59,48,0.10);
+  color: #FF3B30;
+}
+
+/* Detail grid for booking detail modal (legacy, keep for now) */
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px 12px;
 }
 .detail-item { display: flex; flex-direction: column; gap: 2px; }
-.detail-label { font-size: 11px; color: var(--text-secondary); }
-.detail-val { font-size: 14px; font-weight: 500; word-break: break-word; }
-
 
 /* ================================================================
    多选日历

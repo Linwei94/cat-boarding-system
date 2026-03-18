@@ -48,6 +48,12 @@
 
   <!-- 顶部导航 -->
   <header class="app-header">
+    <!-- debug 强制更新按钮（左上角，仅 debug 环境显示） -->
+    <button id="force-update-btn" class="hidden" title="强制刷新缓存" onclick="forceUpdate()"
+      style="position:absolute;left:max(12px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:10;
+             background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.3);border-radius:8px;
+             color:var(--primary);font-size:11px;font-weight:600;padding:4px 8px;cursor:pointer;
+             -webkit-tap-highlight-color:transparent">⟳ 更新</button>
     <div class="app-logo">
       <div class="app-logo-text">
         <span class="app-logo-name">阿里嘎多猫咪寄养</span>
@@ -65,7 +71,6 @@
       <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
     </nav>
     <div class="header-right">
-      <button id="force-update-btn" class="btn btn-outline btn-sm hidden" title="强制刷新缓存" onclick="forceUpdate()" style="font-size:11px;padding:4px 8px;opacity:0.6">⟳ 强制更新</button>
       <button id="logout-btn" class="btn btn-outline btn-sm">退出</button>
     </div>
   </header>
@@ -437,7 +442,7 @@
      ============================================================ -->
 <div id="owner-detail-modal" class="modal hidden">
   <div class="modal-overlay" onclick="hideModal('owner-detail-modal')"></div>
-  <div class="modal-content modal-large">
+  <div class="modal-content modal-large modal-grouped">
     <div class="modal-header">
       <h3 id="owner-detail-name">主人详情</h3>
       <div style="display:flex;gap:8px;align-items:center">
@@ -463,7 +468,7 @@
      ============================================================ -->
 <div id="cat-detail-modal" class="modal hidden">
   <div class="modal-overlay" onclick="hideModal('cat-detail-modal')"></div>
-  <div class="modal-content modal-large">
+  <div class="modal-content modal-large modal-grouped">
     <div class="modal-header">
       <h3 id="cat-detail-name">猫咪详情</h3>
       <div style="display:flex;gap:8px;align-items:center">
@@ -856,15 +861,11 @@
 <!-- 预约详情弹窗 -->
 <div id="booking-detail-modal" class="modal hidden">
   <div class="modal-overlay" onclick="hideModal('booking-detail-modal')"></div>
-  <div class="modal-content modal-large">
-    <div class="modal-header">
-      <h3>预约详情</h3>
-      <button class="modal-close" onclick="hideModal('booking-detail-modal')">✕</button>
-    </div>
-    <div id="booking-detail-body" style="padding:20px;overflow-y:auto"></div>
-    <div class="modal-footer" style="display:flex;gap:8px;padding:16px">
-      <button id="bd-confirm-btn" class="btn btn-primary btn-sm" style="flex:1" onclick="updateBookingStatus('confirmed')">✅ 确认入住</button>
-      <button id="bd-reject-btn" class="btn btn-danger btn-sm" style="flex:1" onclick="updateBookingStatus('rejected')">✕ 取消预约</button>
+  <div class="modal-content modal-grouped">
+    <div id="booking-detail-body"></div>
+    <div class="bd-footer">
+      <button id="bd-confirm-btn" class="bd-action-btn bd-action-confirm" onclick="updateBookingStatus('confirmed')">✅ 确认入住</button>
+      <button id="bd-reject-btn" class="bd-action-btn bd-action-reject" onclick="updateBookingStatus('rejected')">✕ 取消预约</button>
     </div>
   </div>
 </div>

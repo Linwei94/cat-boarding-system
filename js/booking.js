@@ -249,19 +249,35 @@ function neuteredLabel(v) {
 function transportLabel(v) {
   return v === 'self' ? '自送' : v === 'pickup' ? '上门接送' : v || '-';
 }
+function statusConfig(s) {
+  if (s === 'confirmed') return { label: '已确认入住', color: 'var(--success)', bg: 'rgba(52,199,89,0.12)' };
+  if (s === 'rejected')  return { label: '已取消',     color: '#8E8E93',        bg: 'rgba(142,142,147,0.12)' };
+  return                        { label: '待确认',      color: '#FF9500',        bg: 'rgba(255,149,0,0.12)' };
+}
 
-function catBlock(label, cat) {
+// build an iOS-style grouped row list
+function bdRows(...items) {
+  const rows = items.filter(Boolean).map(([label, val, extra]) =>
+    `<div class="bd-row${extra ? ' bd-row-full' : ''}">
+       <span class="bd-row-label">${label}</span>
+       <span class="bd-row-value">${val}</span>
+     </div>`
+  ).join('');
+  return `<div class="bd-rows">${rows}</div>`;
+}
+
+function catSection(cat, title) {
+  const rows = [
+    ['性别',   genderLabel(cat.cat_gender)],
+    ['绝育',   neuteredLabel(cat.cat_neutered)],
+    cat.cat_breed ? ['品种', cat.cat_breed] : null,
+    cat.cat_age   ? ['年龄', cat.cat_age]   : null,
+    cat.cat_notes ? ['备注', cat.cat_notes, 'full'] : null,
+  ];
   return `
-    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:8px">
-      <div style="font-size:13px;font-weight:700;margin-bottom:8px">${label}</div>
-      <div class="detail-grid">
-        <div class="detail-item"><span class="detail-label">名字</span><span class="detail-val">${cat.cat_name || '-'}</span></div>
-        <div class="detail-item"><span class="detail-label">性别</span><span class="detail-val">${genderLabel(cat.cat_gender)}</span></div>
-        <div class="detail-item"><span class="detail-label">绝育</span><span class="detail-val">${neuteredLabel(cat.cat_neutered)}</span></div>
-        <div class="detail-item"><span class="detail-label">品种</span><span class="detail-val">${cat.cat_breed || '-'}</span></div>
-        <div class="detail-item"><span class="detail-label">年龄</span><span class="detail-val">${cat.cat_age || '-'}</span></div>
-        ${cat.cat_notes ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">备注</span><span class="detail-val">${cat.cat_notes}</span></div>` : ''}
-      </div>
+    <div class="bd-section">
+      <div class="bd-section-header">${title}</div>
+      ${bdRows(...rows)}
     </div>`;
 }
 
@@ -270,62 +286,90 @@ export function openBookingDetail(requestId) {
   if (!req) return;
   _activeRequestId = requestId;
 
-  const extraCats = req.additional_cats || [];
-  const allCatBlocks = [
-    catBlock(extraCats.length ? '🐱 第 1 只猫咪' : '🐱 猫咪信息', req),
-    ...extraCats.map((c, i) => catBlock(`🐱 第 ${i + 2} 只猫咪`, c)),
-  ].join('');
+  const cats = [req, ...(req.additional_cats || [])];
+  const allCatNames = cats.map(c => c.cat_name).join('、');
+  const sc = statusConfig(req.status);
+  const nights = Math.round((new Date(req.check_out_date) - new Date(req.check_in_date)) / 86400000);
+
+  // Multi-cat tabs (only when > 1)
+  const catTabs = cats.length > 1
+    ? `<div class="bd-cat-tabs">${cats.map((c, i) =>
+        `<button class="bd-cat-tab${i === 0 ? ' active' : ''}" onclick="switchBdCat(${i})" data-idx="${i}">
+          🐱 ${c.cat_name}
+        </button>`).join('')}</div>`
+    : '';
+
+  // Build cat sections (all rendered, toggled via JS)
+  const catSections = cats.map((c, i) =>
+    `<div class="bd-cat-panel${i === 0 ? ' active' : ''}" data-cat-idx="${i}">
+      ${catSection(c, cats.length > 1 ? `第 ${i + 1} 只 · ${c.cat_name}` : '猫咪信息')}
+    </div>`
+  ).join('');
 
   const body = document.getElementById('booking-detail-body');
   body.innerHTML = `
-    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">
+    <!-- Hero -->
+    <div class="bd-hero">
+      <button class="bd-close" onclick="hideModal('booking-detail-modal')">✕</button>
+      <div class="bd-hero-emoji">🐱</div>
+      <div class="bd-hero-names">${allCatNames}</div>
+      <div class="bd-hero-owner">${req.owner_name}</div>
+      <div class="bd-hero-badge" style="background:${sc.bg};color:${sc.color}">${sc.label}</div>
+      <div class="bd-hero-dates">
+        <span>${req.check_in_date}</span>
+        <span class="bd-hero-arrow">→</span>
+        <span>${req.check_out_date}</span>
+        <span class="bd-hero-nights">${nights} 晚</span>
+      </div>
+    </div>
+
+    <!-- 主人 -->
+    <div class="bd-section">
+      <div class="bd-section-header">主人</div>
+      ${bdRows(
+        ['姓名', req.owner_name],
+        ['电话', `<a href="tel:${req.owner_phone}" class="bd-link">${req.owner_phone}</a>`],
+        req.owner_wechat  ? ['微信', req.owner_wechat]  : null,
+        req.owner_email   ? ['邮箱', req.owner_email]   : null,
+        req.owner_address ? ['地址', req.owner_address, 'full'] : null,
+      )}
+    </div>
+
+    <!-- 猫咪 -->
+    ${catTabs}
+    ${catSections}
+
+    <!-- 寄养安排 -->
+    <div class="bd-section">
+      <div class="bd-section-header">寄养安排</div>
+      ${bdRows(
+        ['入住', req.check_in_date],
+        ['退房', req.check_out_date],
+        ['天数', `${nights} 晚`],
+        req.transport     ? ['接送', transportLabel(req.transport)] : null,
+        req.booking_notes ? ['备注', req.booking_notes, 'full']     : null,
+      )}
+    </div>
+
+    <div style="font-size:11px;color:var(--text-tertiary);text-align:center;padding:8px 0 4px">
       提交于 ${req.submitted_at?.slice(0, 16).replace('T', ' ')}
-    </div>
-
-    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">主人信息</div>
-    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-      <div class="detail-grid">
-        <div class="detail-item"><span class="detail-label">姓名</span><span class="detail-val">${req.owner_name}</span></div>
-        <div class="detail-item"><span class="detail-label">电话</span><span class="detail-val"><a href="tel:${req.owner_phone}" style="color:var(--primary)">${req.owner_phone}</a></span></div>
-        ${req.owner_wechat ? `<div class="detail-item"><span class="detail-label">微信</span><span class="detail-val">${req.owner_wechat}</span></div>` : ''}
-        ${req.owner_email ? `<div class="detail-item"><span class="detail-label">邮箱</span><span class="detail-val">${req.owner_email}</span></div>` : ''}
-        ${req.owner_address ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">地址</span><span class="detail-val">${req.owner_address}</span></div>` : ''}
-      </div>
-    </div>
-
-    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">猫咪信息</div>
-    ${allCatBlocks}
-
-    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-secondary)">寄养安排</div>
-    <div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-      <div class="detail-grid">
-        <div class="detail-item"><span class="detail-label">入住</span><span class="detail-val">${req.check_in_date}</span></div>
-        <div class="detail-item"><span class="detail-label">退房</span><span class="detail-val">${req.check_out_date}</span></div>
-        <div class="detail-item"><span class="detail-label">接送</span><span class="detail-val">${transportLabel(req.transport)}</span></div>
-        ${req.booking_notes ? `<div class="detail-item" style="grid-column:1/-1"><span class="detail-label">备注</span><span class="detail-val">${req.booking_notes}</span></div>` : ''}
-      </div>
     </div>
   `;
 
-  // 根据当前状态调整按钮
+  // action buttons state
   const confirmBtn = document.getElementById('bd-confirm-btn');
   const rejectBtn  = document.getElementById('bd-reject-btn');
-  if (req.status === 'confirmed') {
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = '✅ 已确认';
-  } else {
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = '✅ 确认入住';
-  }
-  if (req.status === 'rejected') {
-    rejectBtn.disabled = true;
-    rejectBtn.textContent = '已取消';
-  } else {
-    rejectBtn.disabled = false;
-    rejectBtn.textContent = '✕ 取消预约';
-  }
+  confirmBtn.disabled = req.status === 'confirmed';
+  confirmBtn.textContent = req.status === 'confirmed' ? '✅ 已确认入住' : '✅ 确认入住';
+  rejectBtn.disabled = req.status === 'rejected';
+  rejectBtn.textContent = req.status === 'rejected' ? '已取消' : '✕ 取消预约';
 
   showModal('booking-detail-modal');
+}
+
+export function switchBdCat(idx) {
+  document.querySelectorAll('.bd-cat-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.bd-cat-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
 }
 
 export async function updateBookingStatus(status) {
@@ -348,5 +392,6 @@ window.recopyLink         = recopyLink;
 window.deleteBookingToken = deleteBookingToken;
 window.toggleBookingCard  = toggleBookingCard;
 window.saveAdminEmail     = saveAdminEmail;
-window.openBookingDetail  = openBookingDetail;
+window.openBookingDetail   = openBookingDetail;
 window.updateBookingStatus = updateBookingStatus;
+window.switchBdCat         = switchBdCat;
