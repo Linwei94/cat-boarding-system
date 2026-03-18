@@ -43,11 +43,12 @@ function getVisitIncome(startStr, endStr) {
 
 function fitStatNumbers() {
   document.querySelectorAll('.stat-number').forEach(el => {
-    const len = el.textContent.replace(/\s/g, '').length;
-    if      (len > 10) el.style.fontSize = '13px';
-    else if (len > 8)  el.style.fontSize = '15px';
-    else if (len > 6)  el.style.fontSize = '18px';
-    else               el.style.fontSize = '';
+    el.style.fontSize = '';            // reset to CSS default (24px)
+    if (!el.offsetWidth) return;       // not visible yet
+    let size = 24;
+    while (el.scrollWidth > el.offsetWidth && size > 11) {
+      el.style.fontSize = --size + 'px';
+    }
   });
 }
 
