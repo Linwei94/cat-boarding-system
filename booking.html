@@ -492,15 +492,20 @@
       <input class="form-input" id="f-checkout" type="date">
     </div>
     <div id="date-calc" style="background:rgba(255,107,107,0.06);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--text-secondary);display:none">
-      🐾 预计寄养 <strong id="date-days" style="color:var(--primary)"></strong> 天
+      <div>🐾 预计寄养 <strong id="date-days" style="color:var(--primary)"></strong> 晚</div>
+      <div id="date-price" style="margin-top:6px;font-size:13px"></div>
     </div>
     <div class="form-group">
       <label class="form-label">预计接送方式</label>
-      <select class="form-select" id="f-transport">
+      <select class="form-select" id="f-transport" onchange="onTransportChange(this.value)">
         <option value="">请选择</option>
         <option value="self">自行送达 / 自行接回</option>
         <option value="need-pickup">需要上门接送（另行沟通费用）</option>
       </select>
+    </div>
+    <div class="form-group" id="pickup-address-group" style="display:none">
+      <label class="form-label">接送地址 <span class="req">*</span></label>
+      <input class="form-input" id="f-pickup-address" placeholder="您的完整地址（上门接送用）" autocomplete="street-address">
     </div>
     <div class="form-group">
       <label class="form-label">其他备注</label>
@@ -597,6 +602,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
   import { NOTICES, BUSINESS_INFO } from './booking-notices.js';
+  const RATE_STD  = BUSINESS_INFO.rate_standard ?? 45;
+  const RATE_DLX  = BUSINESS_INFO.rate_deluxe   ?? 75;
+  const CURRENCY  = BUSINESS_INFO.currency       ?? 'AUD';
   import { SUPABASE_URL, SUPABASE_ANON_KEY } from './js/config.js';
 
   // ── Supabase 客户端（公开 anon key，客户端可用） ──
@@ -865,15 +873,21 @@
   };
 
   window.submitDatesStep = function() {
-    clearErrs(['f-checkin', 'f-checkout']);
+    clearErrs(['f-checkin', 'f-checkout', 'f-pickup-address']);
     const ci = document.getElementById('f-checkin').value;
     const co = document.getElementById('f-checkout').value;
     if (!ci) { showErr('f-checkin', '请选择入住日期'); return; }
     if (!co) { showErr('f-checkout', '请选择退房日期'); return; }
     if (co <= ci) { showErr('f-checkout', '退房日期须晚于入住日期'); return; }
+    const transport = document.getElementById('f-transport').value;
+    if (transport === 'need-pickup') {
+      const addr = document.getElementById('f-pickup-address').value.trim();
+      if (!addr) { showErr('f-pickup-address', '选择上门接送时，请填写接送地址'); return; }
+      FORM_DATA.pickup_address = addr;
+    }
     FORM_DATA.check_in = ci;
     FORM_DATA.check_out = co;
-    FORM_DATA.transport = document.getElementById('f-transport').value;
+    FORM_DATA.transport = transport;
     FORM_DATA.booking_notes = document.getElementById('f-booking-notes').value.trim();
     nextStep();
   };
@@ -886,21 +900,39 @@
     nextStep();
   };
 
-  // ── 日期天数计算 ─────────────────────────────────
+  // ── 日期天数 + 费用估算 ───────────────────────────
+  function updateDateCalc() {
+    const ci = document.getElementById('f-checkin').value;
+    const co = document.getElementById('f-checkout').value;
+    const el = document.getElementById('date-calc');
+    if (ci && co && co > ci) {
+      const nights = Math.ceil((new Date(co) - new Date(ci)) / 86400000);
+      document.getElementById('date-days').textContent = nights;
+      const lo = nights * RATE_STD;
+      const hi = nights * RATE_DLX;
+      document.getElementById('date-price').innerHTML =
+        `💰 预估费用：<strong style="color:var(--primary)">${CURRENCY} $${lo}</strong> – <strong style="color:var(--primary)">$${hi}</strong>` +
+        `<span style="font-size:12px;margin-left:4px">（标准 $${RATE_STD}/晚 · 豪华 $${RATE_DLX}/晚）</span>`;
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
   ['f-checkin','f-checkout'].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
-      const ci = document.getElementById('f-checkin').value;
-      const co = document.getElementById('f-checkout').value;
-      const el = document.getElementById('date-calc');
-      if (ci && co && co > ci) {
-        const days = Math.ceil((new Date(co) - new Date(ci)) / 86400000);
-        document.getElementById('date-days').textContent = days;
-        el.style.display = 'block';
-      } else {
-        el.style.display = 'none';
-      }
-    });
+    document.getElementById(id).addEventListener('change', updateDateCalc);
   });
+
+  // ── 接送方式切换 ──────────────────────────────────
+  window.onTransportChange = function(val) {
+    const group = document.getElementById('pickup-address-group');
+    group.style.display = val === 'need-pickup' ? 'flex' : 'none';
+    // clear error when hiding
+    if (val !== 'need-pickup') {
+      const input = document.getElementById('f-pickup-address');
+      const err = input.parentNode.querySelector('.field-error');
+      if (err) err.textContent = '';
+    }
+  };
   // Set min date = today
   document.getElementById('f-checkin').min = new Date().toLocaleDateString('en-CA');
   document.getElementById('f-checkout').min = new Date().toLocaleDateString('en-CA');
@@ -1011,8 +1043,9 @@
         cat_notes:     FORM_DATA.cat_notes || null,
         check_in_date: FORM_DATA.check_in,
         check_out_date:FORM_DATA.check_out,
-        transport:     FORM_DATA.transport || null,
-        booking_notes: FORM_DATA.booking_notes || null,
+        transport:      FORM_DATA.transport || null,
+        pickup_address: FORM_DATA.pickup_address || null,
+        booking_notes:  FORM_DATA.booking_notes || null,
         signature_data:FORM_DATA.signature,
         passport_file: passportPath,
         vaccine_file:  vaccinePath,

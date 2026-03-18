@@ -123,7 +123,7 @@ export async function loadBookingRequests() {
   if (tokenIds.length > 0) {
     const { data } = await db
       .from('booking_requests')
-      .select('id, token_id, owner_name, owner_phone, owner_wechat, owner_email, owner_address, cat_name, cat_gender, cat_neutered, cat_breed, cat_age, cat_notes, additional_cats, check_in_date, check_out_date, transport, booking_notes, status, submitted_at')
+      .select('id, token_id, owner_name, owner_phone, owner_wechat, owner_email, owner_address, cat_name, cat_gender, cat_neutered, cat_breed, cat_age, cat_notes, additional_cats, check_in_date, check_out_date, transport, pickup_address, booking_notes, status, submitted_at')
       .in('token_id', tokenIds)
       .order('submitted_at', { ascending: false });
     if (data) requests = data;
@@ -247,7 +247,7 @@ function neuteredLabel(v) {
   return v === 'yes' ? '是' : v === 'no' ? '否' : v === 'unknown' ? '不确定' : '-';
 }
 function transportLabel(v) {
-  return v === 'self' ? '自送' : v === 'pickup' ? '上门接送' : v || '-';
+  return v === 'self' ? '自送' : v === 'need-pickup' ? '上门接送' : v || '-';
 }
 function statusConfig(s) {
   if (s === 'confirmed') return { label: '已确认入住', color: 'var(--success)', bg: 'rgba(52,199,89,0.12)' };
@@ -347,7 +347,19 @@ export function openBookingDetail(requestId) {
         ['退房', req.check_out_date],
         ['天数', `${nights} 晚`],
         req.transport     ? ['接送', transportLabel(req.transport)] : null,
+        req.pickup_address ? ['接送地址', req.pickup_address, 'full'] : null,
         req.booking_notes ? ['备注', req.booking_notes, 'full']     : null,
+      )}
+    </div>
+
+    <!-- 费用参考 -->
+    <div class="bd-section">
+      <div class="bd-section-header">费用参考</div>
+      ${bdRows(
+        ['标准房', `AUD $45 / 晚`],
+        ['豪华房', `AUD $75 / 晚`],
+        ['住宿天数', `${nights} 晚`],
+        ['预估总费用', `<span style="color:var(--primary);font-weight:700">AUD $${nights * 45} – $${nights * 75}</span>`],
       )}
     </div>
 

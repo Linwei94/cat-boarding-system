@@ -76,4 +76,8 @@ export const BUSINESS_INFO = {
   wechat: '',     // 填入微信号
   phone: '',      // 填入电话
   instagram: '',  // 填入 Instagram
+  // 寄养费用（管理员可修改）
+  rate_standard: 45,   // AUD/晚 标准房
+  rate_deluxe:   75,   // AUD/晚 豪华房
+  currency:      'AUD',
 };
