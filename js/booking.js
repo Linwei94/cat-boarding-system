@@ -49,14 +49,26 @@ export async function openGenerateLink() {
   }
 }
 
-// 复制框里的复制按钮（新的用户手势，iOS 可用）
-export function copyFromLinkModal() {
-  copyText(generatedLink).then(() => {
-    showToast('🔗 链接已复制，发给客户即可！', 'success');
-    setTimeout(() => hideModal('link-ready-modal'), 600);
-  }).catch(() => {
-    showToast('复制失败，请长按上方链接手动复制', 'error');
-  });
+// 分享/复制按钮：优先用 Web Share API（iOS 原生分享面板），降级到剪贴板
+export async function copyFromLinkModal() {
+  // Web Share API：iOS Safari 弹出原生分享面板（复制/微信/AirDrop 等）
+  if (navigator.share) {
+    try {
+      await navigator.share({ url: generatedLink, title: '阿里嘎多猫咪寄养预约链接' });
+      hideModal('link-ready-modal');
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return; // 用户取消，不报错
+    }
+  }
+  // 降级：剪贴板（HTTPS 环境）
+  try {
+    await copyText(generatedLink);
+    showToast('🔗 链接已复制！', 'success');
+    setTimeout(() => hideModal('link-ready-modal'), 500);
+  } catch {
+    showToast('请长按上方链接文字手动复制', 'warning');
+  }
 }
 
 export function copyBookingLink() {

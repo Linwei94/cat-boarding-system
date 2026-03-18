@@ -2,7 +2,7 @@ export function showModal(id) {
   const modal = document.getElementById(id);
   modal.classList.remove('hidden');
   // Reset any leftover transform from previous dismiss gesture
-  const content = modal.querySelector('.modal-content');
+  const content = modal.querySelector('.modal-content, .link-action-sheet');
   if (content) {
     content.style.transition = '';
     content.style.transform = '';
@@ -13,7 +13,7 @@ export function showModal(id) {
 
 export function hideModal(id) {
   const modal = document.getElementById(id);
-  const content = modal.querySelector('.modal-content');
+  const content = modal.querySelector('.modal-content, .link-action-sheet');
   const overlay = modal.querySelector('.modal-overlay');
   if (content) {
     content.style.transition = 'transform 0.26s cubic-bezier(0.4,0,1,1), opacity 0.18s';

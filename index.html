@@ -830,21 +830,25 @@
   </div>
 </div>
 
-<!-- 链接已生成 Modal -->
+<!-- 链接已生成 Action Sheet（iOS 18 风格） -->
 <div id="link-ready-modal" class="modal hidden">
   <div class="modal-overlay" onclick="hideModal('link-ready-modal')"></div>
-  <div class="modal-content" style="max-width:400px">
-    <div class="modal-header">
-      <h3>🔗 链接已生成</h3>
-      <button class="modal-close" onclick="hideModal('link-ready-modal')">✕</button>
+  <div class="link-action-sheet">
+    <!-- 内容卡片 -->
+    <div class="link-sheet-card">
+      <div class="link-sheet-icon">🔗</div>
+      <div class="link-sheet-title">预约链接已生成</div>
+      <div class="link-sheet-subtitle">7天内有效，发给客户填写</div>
+      <div id="link-ready-url" class="link-sheet-url"></div>
     </div>
-    <div style="padding:16px 24px 8px">
-      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px">点击下方按钮复制链接，发给客户即可</p>
-      <div id="link-ready-url" style="font-size:11px;color:var(--text-secondary);word-break:break-all;background:rgba(255,107,107,0.06);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:16px;user-select:all;-webkit-user-select:all"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary btn-full" style="font-size:16px;padding:14px" onclick="copyFromLinkModal()">📋 复制链接</button>
-    </div>
+    <!-- 主操作按钮 -->
+    <button class="link-sheet-btn link-sheet-btn-primary" onclick="copyFromLinkModal()">
+      分享 / 复制链接
+    </button>
+    <!-- 取消 -->
+    <button class="link-sheet-btn link-sheet-btn-cancel" onclick="hideModal('link-ready-modal')">
+      取消
+    </button>
   </div>
 </div>
 
