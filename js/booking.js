@@ -72,10 +72,8 @@ export async function loadBookingRequests() {
   if (!tokens || tokens.length === 0) {
     const container = document.getElementById('booking-requests-list');
     if (container) container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔗</div><p>点击「生成链接」发给客户，<br>客户填写后自动显示在这里</p></div>`;
-    const elPending   = document.getElementById('stat-booking-pending');
-    const elConfirmed = document.getElementById('stat-booking-confirmed');
-    if (elPending)   elPending.textContent   = 0;
-    if (elConfirmed) elConfirmed.textContent = 0;
+    ['stat-booking-pending','stat-booking-confirmed','stat-booking-active','stat-booking-total']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 0; });
     return;
   }
 
@@ -94,12 +92,19 @@ export async function loadBookingRequests() {
   const now = new Date();
 
   // 更新统计卡片
+  const now2 = new Date();
   const pending   = requests.filter(r => r.status === 'pending').length;
   const confirmed = requests.filter(r => r.status === 'confirmed').length;
+  const active    = tokens.filter(t => !t.used && new Date(t.expires_at) >= now2).length;
+  const total     = tokens.length;
   const elPending   = document.getElementById('stat-booking-pending');
   const elConfirmed = document.getElementById('stat-booking-confirmed');
+  const elActive    = document.getElementById('stat-booking-active');
+  const elTotal     = document.getElementById('stat-booking-total');
   if (elPending)   elPending.textContent   = pending;
   if (elConfirmed) elConfirmed.textContent = confirmed;
+  if (elActive)    elActive.textContent    = active;
+  if (elTotal)     elTotal.textContent     = total;
 
   const statusBadge = {
     pending:   '<span class="badge badge-active">⏳ 待确认</span>',
