@@ -65,6 +65,7 @@
       <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
     </nav>
     <div class="header-right">
+      <button id="force-update-btn" class="btn btn-outline btn-sm hidden" title="强制刷新缓存" onclick="forceUpdate()" style="font-size:11px;padding:4px 8px;opacity:0.6">⟳ 强制更新</button>
       <button id="logout-btn" class="btn btn-outline btn-sm">退出</button>
     </div>
   </header>
@@ -883,5 +884,38 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- 主应用模块 -->
 <script type="module" src="js/main.js"></script>
+<script>
+  // 只在 debug 环境显示强制更新按钮
+  // debug 条件：localhost / 局域网 IP / ?debug 参数
+  (function() {
+    const h = location.hostname;
+    const isDebug = h === 'localhost' || h === '127.0.0.1'
+      || /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(h)
+      || new URLSearchParams(location.search).has('debug');
+    if (isDebug) {
+      const btn = document.getElementById('force-update-btn');
+      if (btn) btn.classList.remove('hidden');
+    }
+  })();
+
+  async function forceUpdate() {
+    const btn = document.getElementById('force-update-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '刷新中…'; }
+    try {
+      // 清除所有 Cache Storage
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      // 注销所有 Service Worker
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+    } catch(e) {}
+    // 强制绕过缓存重新加载
+    location.href = location.pathname + '?t=' + Date.now();
+  }
+</script>
 </body>
 </html>
