@@ -21,30 +21,32 @@ export async function openGenerateLink() {
   const btn = document.querySelector('[onclick="openGenerateLink()"]');
   if (btn) { btn.disabled = true; btn.textContent = '生成中…'; }
 
+  // 在任何 await 之前生成 token + 发起剪贴板（iOS 需要在用户手势内）
+  const token = crypto.randomUUID();
+  const base = window.location.origin + window.location.pathname.replace('index.html', '');
+  generatedLink = `${base}booking.html?token=${token}`;
+  const copyPromise = copyText(generatedLink);
+
   try {
     const { data: { user }, error: authErr } = await db.auth.getUser();
     if (authErr || !user) { showToast('请先登录', 'error'); return; }
 
     const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();
-    const { data, error } = await db.from('booking_tokens').insert({
+    const { error } = await db.from('booking_tokens').insert({
+      token,
       created_by: user.id,
       expires_at:  expiresAt,
-    }).select('token').single();
+    });
 
     if (error) { showToast('生成失败：' + error.message, 'error'); return; }
 
-    const base = window.location.origin + window.location.pathname.replace('index.html', '');
-    generatedLink = `${base}booking.html?token=${data.token}`;
-
-    // 直接复制到剪贴板
     try {
-      await copyText(generatedLink);
+      await copyPromise;
       showToast('🔗 链接已复制，发给客户即可！', 'success');
     } catch {
-      showToast('请手动复制链接', 'error');
+      showToast('链接已生成，请点击列表中「复制」', 'warning');
     }
 
-    // 刷新列表
     await loadBookingRequests();
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '+ 生成链接'; }
