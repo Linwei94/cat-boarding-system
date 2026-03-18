@@ -279,10 +279,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding-bottom: max(env(safe-area-inset-bottom), 4px);
-  padding-top: 4px;
+  padding-bottom: max(env(safe-area-inset-bottom), 6px);
+  padding-top: 6px;
   pointer-events: none;
-  background: transparent;
+  background: linear-gradient(to bottom, transparent, rgba(255,248,245,0.9) 30%);
 }
 
 .bottom-nav-pill {

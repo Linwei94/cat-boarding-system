@@ -582,12 +582,13 @@
 
 </div><!-- #wizard -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
   import { NOTICES, BUSINESS_INFO } from './booking-notices.js';
   import { SUPABASE_URL, SUPABASE_ANON_KEY } from './js/config.js';
 
   // ── Supabase 客户端（公开 anon key，客户端可用） ──
-  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  const { createClient } = window.supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ── Token 验证 ───────────────────────────────────
@@ -603,7 +604,7 @@
       .eq('token', token)
       .single();
 
-    if (error || !data) return showInvalid(error ? `[调试] ${error.code}: ${error.message}` : '[调试] 未找到此 token');
+    if (error || !data) return showInvalid();
     if (data.used) return showInvalid('此链接已被使用，每个链接只能提交一次。');
     if (new Date(data.expires_at) < new Date()) return showInvalid('此链接已过期，请联系寄养管家获取新链接。');
 
