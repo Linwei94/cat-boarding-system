@@ -150,6 +150,5 @@ export async function loadBookingRequests() {
 
 // 挂载到 window 供 HTML 调用
 window.openGenerateLink = openGenerateLink;
-window.generateBookingLink = generateBookingLink;
 window.copyBookingLink = copyBookingLink;
 window.resetGenLink = resetGenLink;
