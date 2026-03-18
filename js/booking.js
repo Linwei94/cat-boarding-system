@@ -82,7 +82,7 @@ export function copyBookingLink() {
 
 // ── 管理员通知邮箱 ────────────────────────────────
 export async function loadAdminEmail() {
-  const { data } = await db.from('admin_settings').select('notification_email').single();
+  const { data } = await db.from('admin_settings').select('notification_email').maybeSingle();
   const input = document.getElementById('notification-email');
   if (input && data?.notification_email) input.value = data.notification_email;
 }

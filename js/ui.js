@@ -42,7 +42,7 @@ export function hideModal(id) {
 // iOS-style swipe-down-to-dismiss for modal sheets
 export function initSheetDismiss() {
   document.querySelectorAll('.modal').forEach(modal => {
-    const content = modal.querySelector('.modal-content');
+    const content = modal.querySelector('.modal-content, .link-action-sheet');
     if (!content) return;
 
     let startY = 0, startScrollTop = 0, dragging = false;

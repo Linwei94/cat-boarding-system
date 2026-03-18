@@ -949,7 +949,7 @@
 
       // 发送邮件通知（Edge Function，失败不影响提交流程）
       if (insertedRequest?.id) {
-        const fnUrl = SUPABASE_URL.replace('supabase.co', 'supabase.co') + '/functions/v1/notify-booking';
+        const fnUrl = SUPABASE_URL.replace('supabase.co', 'functions.supabase.co') + '/functions/v1/notify-booking';
         fetch(fnUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },

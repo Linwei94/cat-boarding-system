@@ -1,11 +1,14 @@
--- 管理员个人设置表（每个管理员账号一行）
-create table if not exists admin_settings (
-  user_id           uuid primary key references auth.users(id) on delete cascade,
+-- 管理员个人设置表
+CREATE TABLE IF NOT EXISTS admin_settings (
+  user_id           uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   notification_email text,
-  updated_at        timestamptz not null default now()
+  updated_at        timestamptz NOT NULL DEFAULT now()
 );
 
-alter table admin_settings enable row level security;
+ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;
 
-create policy "owner rw admin_settings" on admin_settings
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "owner rw admin_settings" ON admin_settings
+    FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
