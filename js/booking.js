@@ -92,46 +92,57 @@ export async function loadBookingRequests() {
     rejected:  '<span class="badge badge-cancelled">已拒绝</span>',
   };
 
-  const rows = tokens.map(t => {
+  const rows = tokens.map((t, i) => {
     const req     = requests.find(r => r.token_id === t.id);
     const expired = new Date(t.expires_at) < now;
+    const createdDate = t.created_at.slice(0, 10);
+    const num = `#${tokens.length - i}`;
 
     if (req) {
-      // 已提交的申请 — 用 settings-section 卡片风格
       return `
         <div class="settings-section" style="margin-bottom:10px;padding:14px 16px">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
             <div style="min-width:0">
+              <div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px">${num} · ${createdDate}</div>
               <div style="font-size:15px;font-weight:700;margin-bottom:4px">🐱 ${req.cat_name} &nbsp;·&nbsp; ${req.owner_name}</div>
               <div style="font-size:13px;color:var(--text-secondary)">${req.check_in_date} → ${req.check_out_date}</div>
               ${t.note ? `<div style="font-size:12px;color:#bbb;margin-top:2px">${t.note}</div>` : ''}
             </div>
-            <div style="flex-shrink:0;margin-top:2px">${statusBadge[req.status] || req.status}</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+              ${statusBadge[req.status] || req.status}
+              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
+            </div>
+          </div>
+        </div>`;
+    } else if (expired) {
+      return `
+        <div class="settings-section" style="margin-bottom:10px;padding:14px 16px;opacity:0.5">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px">${num} · ${createdDate}</div>
+              <div style="font-size:14px;font-weight:600">${t.customer_name ? `${t.customer_name} 的链接` : '预约链接'}</div>
+              ${t.note ? `<div style="font-size:12px;color:#bbb;margin-top:2px">${t.note}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span style="font-size:12px;color:#aaa">已过期</span>
+              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
+            </div>
           </div>
         </div>`;
     } else {
-      // 未提交的 token
-      if (expired) return `
-        <div class="settings-section" style="margin-bottom:10px;padding:14px 16px;opacity:0.45">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div>
-              <div style="font-size:14px;font-weight:600">${t.customer_name ? `${t.customer_name} 的链接` : '链接'}</div>
-              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">已过期 · ${t.expires_at.slice(0,10)}</div>
-            </div>
-            <span style="font-size:12px;color:#aaa">已过期</span>
-          </div>
-        </div>`;
-
+      const daysLeft = Math.ceil((new Date(t.expires_at) - now) / 86400000);
       return `
         <div class="settings-section" style="margin-bottom:10px;padding:14px 16px">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
             <div style="min-width:0">
+              <div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px">${num} · ${createdDate}</div>
               <div style="font-size:14px;font-weight:700">${t.customer_name ? `${t.customer_name} 的链接` : '预约链接'}</div>
-              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${t.note ? t.note + ' · ' : ''}过期 ${t.expires_at.slice(0,10)}</div>
+              ${t.note ? `<div style="font-size:12px;color:#bbb;margin-top:2px">${t.note}</div>` : ''}
+              <div style="font-size:12px;color:#FF9500;margin-top:3px">待填写 · 还剩 ${daysLeft} 天</div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span style="font-size:12px;color:#FF9500;font-weight:600">待填写</span>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               <button class="btn btn-xs btn-secondary" onclick="recopyLink('${t.token}')">复制</button>
+              <button class="btn btn-xs btn-secondary" onclick="deleteBookingToken('${t.id}')" style="color:#ff3b30;border-color:#ff3b30">删除</button>
             </div>
           </div>
         </div>`;
@@ -139,6 +150,14 @@ export async function loadBookingRequests() {
   }).join('');
 
   container.innerHTML = rows || `<div class="empty-state"><div class="empty-icon">🔗</div><p>点击「生成链接」发给客户，<br>客户填写后自动显示在这里</p></div>`;
+}
+
+export async function deleteBookingToken(id) {
+  if (!confirm('确认删除这条预约链接？')) return;
+  const { error } = await db.from('booking_tokens').delete().eq('id', id);
+  if (error) { showToast('删除失败：' + error.message, 'error'); return; }
+  showToast('已删除 ✓', 'success');
+  await loadBookingRequests();
 }
 
 export function recopyLink(token) {
@@ -155,3 +174,4 @@ export function recopyLink(token) {
 window.openGenerateLink = openGenerateLink;
 window.copyBookingLink = copyBookingLink;
 window.recopyLink = recopyLink;
+window.deleteBookingToken = deleteBookingToken;

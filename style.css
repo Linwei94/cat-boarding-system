@@ -141,12 +141,17 @@ body {
    主应用布局
    ================================================================ */
 #app {
-  height: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.main-scroll {
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  overscroll-behavior: none;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -161,9 +166,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
+  flex-shrink: 0;
   box-shadow: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.06);
   height: calc(96px + env(safe-area-inset-top));
 }
@@ -270,17 +275,14 @@ body {
 /* 底部导航栏 */
 /* iOS-style floating pill bottom nav */
 .bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   padding-bottom: max(env(safe-area-inset-bottom), 12px);
   padding-top: 8px;
-  z-index: 100;
   pointer-events: none;
+  background: transparent;
 }
 
 .bottom-nav-pill {
@@ -1376,7 +1378,7 @@ body {
   .desktop-tabs { display: none; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tab-content { padding: 16px; padding-bottom: calc(16px + 90px + env(safe-area-inset-bottom)); min-height: calc(100dvh - 96px - env(safe-area-inset-top)); }
+  .tab-content { padding: 16px; padding-bottom: 24px; }
   .app-header { padding: 0 12px; padding-top: env(safe-area-inset-top); }
   .header-title-center { display: block; }
   .app-logo-text { display: none; }

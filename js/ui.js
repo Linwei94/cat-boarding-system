@@ -103,7 +103,7 @@ function updatePillPosition(activeBtn) {
 }
 
 export function initPullToRefresh(onRefresh) {
-  const el = document.getElementById('app');
+  const el = document.getElementById('main-scroll');
   if (!el) return;
 
   const THRESHOLD = 80;

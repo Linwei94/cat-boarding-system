@@ -25,7 +25,7 @@ import { openAddHomeVisit, openEditHomeVisit, deleteHomeVisit,
 
 import { loadDemoData, clearDemoData } from './demo.js';
 import { openTodayChart, openMonthChart, openYearChart } from './charts.js';
-import { openGenerateLink, copyBookingLink, recopyLink, loadBookingRequests } from './booking.js';
+import { openGenerateLink, copyBookingLink, recopyLink, deleteBookingToken, loadBookingRequests } from './booking.js';
 
 // ── 暴露到 window（供 HTML onclick 调用）────────────────────────
 Object.assign(window, {
@@ -46,7 +46,7 @@ Object.assign(window, {
   // 演示数据
   loadDemoData, clearDemoData,
   // 预约链接
-  openGenerateLink, copyBookingLink, recopyLink,
+  openGenerateLink, copyBookingLink, recopyLink, deleteBookingToken,
   // 图表
   openTodayChart, openMonthChart, openYearChart,
   // 供 render.js 内部调用
