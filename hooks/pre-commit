@@ -1,0 +1,21 @@
+#!/bin/bash
+# Auto-increment build number in js/version.js on every commit
+
+VERSION_FILE="js/version.js"
+
+# Read current version, e.g. v1.58
+current=$(grep -oP "(?<=')[^']*(?=')" "$VERSION_FILE")
+major=$(echo "$current" | cut -d. -f1)   # v1
+build=$(echo "$current" | cut -d. -f2)   # 58
+
+# Increment build number
+new_build=$((build + 1))
+new_version="${major}.${new_build}"
+
+# Write back
+echo "export const VERSION = '${new_version}';" > "$VERSION_FILE"
+
+# Stage the updated file
+git add "$VERSION_FILE"
+
+echo "🏷  Version bumped: ${current} → ${new_version}"

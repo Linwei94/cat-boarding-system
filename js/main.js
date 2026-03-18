@@ -1,6 +1,7 @@
 // ================================================================
 // 喵喵寄养管理系统 - 主入口
 // ================================================================
+import { VERSION } from './version.js';
 import { loadAllData } from './api.js';
 import { initAuth } from './auth.js';
 import { initTabs, initPullToRefresh, initSheetDismiss, showLoading, showToast, hideModal } from './ui.js';
@@ -51,6 +52,9 @@ Object.assign(window, {
   // 供 render.js 内部调用
   __renderModule: { renderBoardingsTable },
 });
+
+// ── 版本号注入 ───────────────────────────────────────────────────
+document.querySelectorAll('#app-version, #app-version-desktop').forEach(el => { el.textContent = VERSION; });
 
 // ── 启动 ─────────────────────────────────────────────────────────
 initTabs();
