@@ -62,7 +62,15 @@ export async function loadBookingRequests() {
     .order('created_at', { ascending: false })
     .limit(30);
 
-  if (!tokens || tokens.length === 0) return;
+  if (!tokens || tokens.length === 0) {
+    const container = document.getElementById('booking-requests-list');
+    if (container) container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔗</div><p>点击「生成链接」发给客户，<br>客户填写后自动显示在这里</p></div>`;
+    const elPending   = document.getElementById('stat-booking-pending');
+    const elConfirmed = document.getElementById('stat-booking-confirmed');
+    if (elPending)   elPending.textContent   = 0;
+    if (elConfirmed) elConfirmed.textContent = 0;
+    return;
+  }
 
   const tokenIds = tokens.filter(t => t.used).map(t => t.id);
   let requests = [];
