@@ -1028,7 +1028,11 @@
       const vaccinePath = await uploadFile(document.getElementById('f-vaccine'), 'vaccines');
       const catPhotoPath = await uploadFile(document.getElementById('f-catphoto'), 'cat-photos');
 
-      const { data: insertedRequest, error } = await sb.from('booking_requests').insert({
+      // Generate UUID client-side so we don't need to SELECT it back
+      // (anon users have no SELECT policy on booking_requests)
+      const requestId = crypto.randomUUID();
+      const { error } = await sb.from('booking_requests').insert({
+        id:            requestId,
         token_id:      bookingTokenId,
         owner_name:    FORM_DATA.owner_name,
         owner_phone:   FORM_DATA.owner_phone,
@@ -1053,7 +1057,7 @@
         notices_confirmed: FORM_DATA.notices_confirmed,
         additional_cats: FORM_DATA.additional_cats?.length ? FORM_DATA.additional_cats : null,
         status: 'pending',
-      }).select('id').single();
+      });
 
       if (error) throw error;
 
@@ -1063,14 +1067,12 @@
       }
 
       // 发送邮件通知（Edge Function，失败不影响提交流程）
-      if (insertedRequest?.id) {
-        const fnUrl = SUPABASE_URL + '/functions/v1/notify-booking';
-        fetch(fnUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-          body: JSON.stringify({ booking_request_id: insertedRequest.id }),
-        }).catch(() => {});
-      }
+      const fnUrl = SUPABASE_URL + '/functions/v1/notify-booking';
+      fetch(fnUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ booking_request_id: requestId }),
+      }).catch(() => {});
 
       // 成功
       const allCatNames = [FORM_DATA.cat_name, ...(FORM_DATA.additional_cats||[]).map(c=>c.cat_name)].join('、');
