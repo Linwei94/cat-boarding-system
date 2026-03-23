@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: '阿里嘎多猫咪寄养 <onboarding@resend.dev>',
+        from: '猫咪寄养 <onboarding@resend.dev>',
         to: [toEmail],
         subject: `🐱 新预约申请：${bk.cat_name}（${bk.owner_name}）`,
         html: `

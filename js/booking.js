@@ -54,7 +54,7 @@ export async function copyFromLinkModal() {
   // Web Share API：iOS Safari 弹出原生分享面板（复制/微信/AirDrop 等）
   if (navigator.share) {
     try {
-      await navigator.share({ url: generatedLink, title: '阿里嘎多猫咪寄养预约链接' });
+      await navigator.share({ url: generatedLink, title: '猫咪寄养预约链接' });
       hideModal('link-ready-modal');
       return;
     } catch (e) {
